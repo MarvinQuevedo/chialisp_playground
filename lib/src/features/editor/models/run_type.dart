@@ -1,0 +1,3 @@
+enum RunType{
+  run, brun
+}
