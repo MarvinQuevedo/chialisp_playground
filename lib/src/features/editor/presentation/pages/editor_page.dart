@@ -1,15 +1,15 @@
+import 'package:chialisp_playground/src/features/editor/presentation/pages/result_controls_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chia_rust_utils/classes/clvm/chia_tools_cmds.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
-import 'package:highlight/languages/lisp.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/run_type.dart';
 import '../../providers/playground_provider.dart';
-import '../../utils/chialisp_obtain_include_files.dart';
-import '../../utils/chialisp_parser.dart';
-import '../widgets/embedded_editor.dart';
+import '../../utils/chialisp.dart';
+import 'package:ionicons/ionicons.dart';
+
+import '../../utils/monokaiSublimeThemeWithFont.dart';
 
 class EditorPage extends StatefulWidget {
   final String orignalCode;
@@ -22,24 +22,21 @@ class EditorPage extends StatefulWidget {
 }
 
 class _EditorPageState extends State<EditorPage> {
-  late final ValueNotifier<List<String?>> _arguments;
-  List<String> _includedFiles = [];
   String? lastCode;
   late final CodeController _controller;
   Map<String, TextStyle> theme = monokaiSublimeTheme;
-  bool showOutput = false;
-  String outputText = "";
-  List<TextEditingController> argsControllers = [];
 
   @override
   void initState() {
-    _arguments = ValueNotifier<List<String?>>([]);
     _controller = CodeController(
       text: widget.orignalCode, // Initial code
-      language: lisp,
+      language: chiaLisp,
     );
 
-    _controller.addListener(_onEditorValueChanged);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _addPersonalizedAutocomplements();
+    });
+
     super.initState();
   }
 
@@ -48,21 +45,38 @@ class _EditorPageState extends State<EditorPage> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: theme['root']!.backgroundColor,
-      body: Column(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 14, 15, 13),
+        title: const Text("ChiaLisp Playground"),
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _openRunPage(context),
+            icon: const Icon(Ionicons.play_circle_outline),
+            iconSize: 40,
+          )
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(top: 0),
         children: [
-          const SizedBox(
-            height: kToolbarHeight,
-          ),
-          Expanded(
-            child: EmbeddedEditor(
-              controller: _controller,
-              runType: widget.runType,
-              height: size.height,
-              width: size.width,
+          CodeTheme(
+            data: CodeThemeData(
+              styles: monokaiSublimeThemeWithFont("JetBrainsMono"),
             ),
-          ),
-          const SizedBox(
-            height: 0,
+            child: SizedBox(
+              width: size.width,
+              child: CodeField(
+                controller: _controller,
+                lineNumberBuilder: (number, style) {
+                  return TextSpan(
+                    text: number.toString(),
+                    style: const TextStyle(
+                        color: Colors.white, backgroundColor: Colors.red),
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -72,191 +86,102 @@ class _EditorPageState extends State<EditorPage> {
           horizontal: 10,
           vertical: 10,
         ),
-        child: Column(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: size.width,
-              height: 75,
-              child: ValueListenableBuilder(
-                  valueListenable: _arguments,
-                  builder: (context, value, child) {
-                    if (value.isEmpty) {
-                      return Container();
-                    }
-                    return SizedBox(
-                      width: size.width,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          final argName = value[index];
-                          final controller = argsControllers.length > index
-                              ? argsControllers[index]
-                              : null;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 10, top: 10),
-                            child: SizedBox(
-                              width: 100,
-                              child: TextField(
-                                controller: controller,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  labelText: argName?.toUpperCase(),
-                                  labelStyle:
-                                      const TextStyle(color: Colors.white),
-                                  hintStyle:
-                                      const TextStyle(color: Colors.white),
-                                  border: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        itemCount: value.length,
-                      ),
-                    );
-                  }),
+            ActionButton(
+              onPressed: _addChar,
+              value: "\t",
+              maxWidth: 45,
+              child: const Text("TAB"),
             ),
-            if (showOutput)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 2,
-                    color: Colors.white,
-                    margin: const EdgeInsets.only(bottom: 5, top: 5),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.runType == RunType.run
-                            ? "Run Output"
-                            : "Brun Output",
-                        style: theme['tag']!.copyWith(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        outputText,
-                        style: theme['tag']!.copyWith(fontSize: 16),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            Container(
-              width: double.infinity,
-              height: 2,
-              color: Colors.white,
-              margin: const EdgeInsets.only(bottom: 5, top: 5),
+            ActionButton(
+              onPressed: _addChar,
+              value: "(",
+              child: const Text("("),
             ),
-            Row(children: [
-              ElevatedButton(
-                onPressed: _run,
-                child: const Text('Run'),
-              ),
-              const SizedBox(width: 20),
-              if (widget.runType == RunType.run)
-                ElevatedButton(
-                  onPressed: () {
-                    _compileClsp();
-                  },
-                  child: const Text('Compile'),
-                ),
-              if (widget.runType == RunType.brun) const SizedBox(width: 10),
-              if (widget.runType == RunType.run) const SizedBox(width: 10),
-            ]),
+            ActionButton(
+              onPressed: _addChar,
+              value: ")",
+              child: const Text(")"),
+            ),
+            ActionButton(
+              onPressed: _addChar,
+              value: ";",
+              child: const Text(";"),
+            ),
           ],
         ),
       ),
     );
   }
 
-  void undo() {}
-
-  void _compileClsp() {
-    final playgroundProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    playgroundProvider.includePuzzleFiles(_includedFiles).then((value) {
-      final playgroundPath = playgroundProvider.playgroundInclude;
-      ChiaToolsCmds.run([_controller.text, '-i', playgroundPath]).then((value) {
-        setState(() {
-          showOutput = true;
-          outputText = value;
-        });
-      });
-    }).catchError((error) {
-      showError(error.toString());
-    });
+  void _addPersonalizedAutocomplements() {
+    final playPro = Provider.of<PlaygroundProvider>(context, listen: false);
+    _controller.autocompleter.setCustomWords(playPro.includeFilesNames);
   }
 
-  void _run() async {
-    final playgroundProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    playgroundProvider.includePuzzleFiles(_includedFiles).then((value) {
-      final playgroundPath = playgroundProvider.playgroundInclude;
-      ChiaToolsCmds.run([_controller.text, '-i', playgroundPath]).then((value) {
-        final args = argsControllers.map((e) => e.text).join(" ");
-        ChiaToolsCmds.brun([value, "($args)", '-i', playgroundPath])
-            .then((value) {
-          setState(() {
-            showOutput = true;
-            outputText = value;
-          });
-        });
-      });
-    }).catchError((error) {
-      showError(error.toString());
-    });
+  void _addChar(value) {
+    _controller.insertStr(value);
   }
 
-  void _onEditorValueChanged() {
-    final watch = Stopwatch()..start();
-    final text = _controller.text;
-    if (text == lastCode) return;
-
-    _arguments.value = parseLisp(text);
-
-    for (var i = 0; i < _arguments.value.length; i++) {
-      if (argsControllers.length <= i) {
-        argsControllers.add(TextEditingController());
-      }
-    }
-    _includedFiles = chialispObtainINcludeFiles(text);
-    lastCode = text;
-
-    watch.stop();
+  _openRunPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultControlsPage(
+          code: _controller.text,
+          theme: theme,
+        ),
+      ),
+    );
   }
+}
 
-  Future showError(String error) async {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: Text(error),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Ok"))
-            ],
-          );
-        });
+class ActionButton extends StatelessWidget {
+  final Widget child;
+  final ValueChanged onPressed;
+  final String value;
+  final double maxWidth;
+  const ActionButton(
+      {super.key,
+      required this.child,
+      required this.onPressed,
+      required this.value,
+      this.maxWidth = 35});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2.5),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 25, maxWidth: maxWidth),
+        child: TextButton(
+          onPressed: () => onPressed(value),
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(monokaiSublimeTheme['meta']!.color),
+            foregroundColor:
+                MaterialStateProperty.all(monokaiSublimeTheme['tag']!.color),
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+            padding: MaterialStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 2.5, vertical: 2.5)),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+          child: DefaultTextStyle(
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: "JetBrainsMono"),
+            child: child,
+          ),
+        ),
+      ),
+    );
   }
 }
