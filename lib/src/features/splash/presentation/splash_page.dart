@@ -66,8 +66,8 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _goToHomePage() {
-    Navigator.of(context).push(MaterialPageRoute(
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
       builder: (context) => const HomePage(),
-    ));
+    ), (route) => false);
   }
 }
