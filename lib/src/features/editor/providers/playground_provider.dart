@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:io';
 import 'dart:developer' as developer;
 import 'dart:typed_data';
@@ -5,10 +7,21 @@ import 'dart:typed_data';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const _LAST_PROJECT = "last_project";
 
 class PlaygroundProvider extends ChangeNotifier {
   late final Directory _appDocDir;
   late final Directory playgroundDir;
+  List<File>? _projects;
+  List<File>? get projects => _projects;
+  File? _activeProject;
+  File? get activeProject => _activeProject;
+
+  String? _activeProjectCode;
+  String? get activeProjectCode => _activeProjectCode;
+
   final List<String> _includeFilesNames = [
     "include",
     "defconstant",
@@ -33,9 +46,19 @@ class PlaygroundProvider extends ChangeNotifier {
     "REMARK"
   ];
 
+  late final SharedPreferences _sharedPreferencfes;
+
   List<String> get includeFilesNames => _includeFilesNames;
 
   String get playgroundInclude => playgroundDir.absolute.path;
+
+  String? get activeProjectName {
+    if (_activeProject == null) {
+      return null;
+    }
+    return _activeProject?.path.split("/").last;
+  }
+  
 
   Future<void> init(AssetBundle rootBundle) async {
     _appDocDir = await getApplicationDocumentsDirectory();
@@ -47,6 +70,24 @@ class PlaygroundProvider extends ChangeNotifier {
     playgroundDir.createSync(recursive: true);
     File puzzleFile = File('${_appDocDir.path}/puzzles.zip');
     await _unArchivePuzzleFile(puzzleFile, rootBundle);
+    await loadProjects();
+    _sharedPreferencfes = await SharedPreferences.getInstance();
+    await readLastProject();
+  }
+
+  Future<void> loadProjects() async {
+    _projects = [];
+    final projectsDir = Directory('${_appDocDir.absolute.path}/projects');
+    if (!projectsDir.existsSync()) {
+      projectsDir.createSync(recursive: true);
+    }
+
+    projectsDir.listSync().forEach((element) {
+      if (element is File) {
+        _projects?.add(element);
+      }
+    });
+    notifyListeners();
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
@@ -90,5 +131,35 @@ class PlaygroundProvider extends ChangeNotifier {
       }
     }
     puzzleFile.deleteSync();
+  }
+
+  Future<void> readLastProject() async {
+    final lastProject = _sharedPreferencfes.getString(_LAST_PROJECT);
+    if (lastProject != null) {
+      final file = File(lastProject);
+      if (file.existsSync()) {
+        await loadProject(file);
+      }
+    }
+  }
+
+  Future<String> loadProject(File file) async {
+    final fileData = await file.readAsString();
+    _activeProject = file;
+    _activeProjectCode = fileData;
+    _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
+    return fileData;
+  }
+  Future<String> loadProjectWithFilename(String fileName)async{
+    final file = File('${_appDocDir.absolute.path}/projects/$fileName');
+    return await loadProject(file);
+  }
+
+  Future<bool> saveProject(String fileName, String content) async {
+    final file = File('${_appDocDir.absolute.path}/projects/$fileName');
+   
+    await file.writeAsString(content);
+    await loadProjects();
+    return true;
   }
 }
