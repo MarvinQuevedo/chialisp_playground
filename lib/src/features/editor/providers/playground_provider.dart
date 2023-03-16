@@ -9,6 +9,11 @@ import 'package:path_provider/path_provider.dart';
 class PlaygroundProvider extends ChangeNotifier {
   late final Directory _appDocDir;
   late final Directory playgroundDir;
+  final List<String> _includeFilesNames = [
+    "include",
+  ];
+
+  List<String> get includeFilesNames => _includeFilesNames;
 
   String get playgroundInclude => playgroundDir.absolute.path;
 
@@ -27,8 +32,7 @@ class PlaygroundProvider extends ChangeNotifier {
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
     for (var puzzleFile in puzzleFiles) {
       final file = File('${_appDocDir.absolute.path}/puzzles/$puzzleFile');
-      final playgroundFile =
-          File('${playgroundDir.absolute.path}/$puzzleFile');
+      final playgroundFile = File('${playgroundDir.absolute.path}/$puzzleFile');
       if (!file.existsSync()) {
         return Future.error(puzzleFile);
       }
@@ -60,6 +64,9 @@ class PlaygroundProvider extends ChangeNotifier {
 
         file.writeContent(outputStream);
         outputStream.close();
+      }
+      if (!file.name.contains("puzzles/")) {
+        _includeFilesNames.add(file.name);
       }
     }
     puzzleFile.deleteSync();
