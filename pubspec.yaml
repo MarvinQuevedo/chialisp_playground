@@ -31,10 +31,11 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_code_editor: ^0.2.13
-  highlight: ^0.7.0
+  highlight: ^0.7.0 
   
   flutter_chia_rust_utils:
     path: ../chia_rs/flutter-binding/flutter_chia_rust_utils 
+ 
   
 
 
@@ -46,6 +47,8 @@ dependencies:
   archive: ^3.3.6
   path_provider: ^2.0.13
   provider: ^6.0.5
+  keyboard_actions: ^4.2.0
+  ionicons: ^0.2.2
 
 dev_dependencies:
   flutter_test:
@@ -84,13 +87,13 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
+  fonts:
+    - family: JetBrainsMono
+      fonts:
+        - asset: fonts/jetbrain-mono/JetBrainsMono-Regular.ttf
+        - asset: fonts/jetbrain-mono/JetBrainsMono-Italic.ttf
+          style: italic
+  
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
