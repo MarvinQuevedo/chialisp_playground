@@ -10,6 +10,8 @@ import '../../utils/chialisp.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../utils/monokaiSublimeThemeWithFont.dart';
+import '../../utils/save_file_dialog.dart';
+import '../widgets/editor_drawer.dart';
 
 class EditorPage extends StatefulWidget {
   final String orignalCode;
@@ -43,75 +45,89 @@ class _EditorPageState extends State<EditorPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: theme['root']!.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 14, 15, 13),
-        title: const Text("ChiaLisp Playground"),
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () => _openRunPage(context),
-            icon: const Icon(Ionicons.play_circle_outline),
-            iconSize: 40,
-          )
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.only(top: 0),
-        children: [
-          CodeTheme(
-            data: CodeThemeData(
-              styles: monokaiSublimeThemeWithFont("JetBrainsMono"),
-            ),
-            child: SizedBox(
-              width: size.width,
-              child: CodeField(
-                controller: _controller,
-                lineNumberBuilder: (number, style) {
-                  return TextSpan(
-                    text: number.toString(),
-                    style: const TextStyle(
-                        color: Colors.white, backgroundColor: Colors.red),
-                  );
-                },
+    return SafeArea(
+      
+      child: Container(
+        color: theme['root']!.backgroundColor,
+        child: Scaffold(
+          backgroundColor: theme['root']!.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: const Color.fromARGB(255, 14, 15, 13),
+            title: const Text("ChiaLisp Playground"),
+            elevation: 0,
+            actions: [
+               IconButton(
+                onPressed: () => _saveFile(context),
+                icon: const Icon(Ionicons.save),
+                iconSize: 40,
+              ),
+              IconButton(
+                onPressed: () => _openRunPage(context),
+                icon: const Icon(Ionicons.play_circle_outline),
+                iconSize: 40,
+              ),
+            ],
+          ),
+          drawer:const EditorDrawer() ,
+          body: ListView(
+            padding: const EdgeInsets.only(top: 0),
+            children: [
+              CodeTheme(
+                data: CodeThemeData(
+                  styles: monokaiSublimeThemeWithFont("JetBrainsMono"),
+                ),
+                child: SizedBox(
+                  width: size.width,
+                  child: CodeField(
+                    controller: _controller,
+                    lineNumberBuilder: (number, style) {
+                      return TextSpan(
+                        text: number.toString(),
+                        style: const TextStyle(
+                            color: Colors.white, backgroundColor: Colors.red),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          bottomSheet: Container(
+          
+            color:  const Color.fromARGB(255, 14, 15, 13),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+            width: size.width,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                      
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: "\t",
+                    maxWidth: 45,
+                    child: const Text("TAB"),
+                  ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: "(",
+                    child: const Text("("),
+                  ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: ")",
+                    child: const Text(")"),
+                  ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: ";",
+                    child: const Text(";"),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
-      bottomSheet: Container(
-        color: theme['root']!.backgroundColor,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ActionButton(
-              onPressed: _addChar,
-              value: "\t",
-              maxWidth: 45,
-              child: const Text("TAB"),
-            ),
-            ActionButton(
-              onPressed: _addChar,
-              value: "(",
-              child: const Text("("),
-            ),
-            ActionButton(
-              onPressed: _addChar,
-              value: ")",
-              child: const Text(")"),
-            ),
-            ActionButton(
-              onPressed: _addChar,
-              value: ";",
-              child: const Text(";"),
-            ),
-          ],
         ),
       ),
     );
@@ -137,6 +153,10 @@ class _EditorPageState extends State<EditorPage> {
       ),
     );
   }
+  
+  _saveFile(BuildContext context) {
+    showSaveFileDialog(context, _controller.text);
+  }
 }
 
 class ActionButton extends StatelessWidget {
@@ -149,7 +169,7 @@ class ActionButton extends StatelessWidget {
       required this.child,
       required this.onPressed,
       required this.value,
-      this.maxWidth = 35});
+      this.maxWidth = 40});
 
   @override
   Widget build(BuildContext context) {
