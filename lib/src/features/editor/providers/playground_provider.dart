@@ -11,6 +11,26 @@ class PlaygroundProvider extends ChangeNotifier {
   late final Directory playgroundDir;
   final List<String> _includeFilesNames = [
     "include",
+    "defconstant",
+    "defun",
+    "defun-inline",
+    "AGG_SIG_UNSAFE",
+    "AGG_SIG_ME",
+    "CREATE_COIN",
+    "RESERVE_FEE",
+    "CREATE_COIN_ANNOUNCEMENT",
+    "ASSERT_COIN_ANNOUNCEMENT",
+    "CREATE_PUZZLE_ANNOUNCEMENT",
+    "ASSERT_PUZZLE_ANNOUNCEMENT",
+    "ASSERT_MY_COIN_ID",
+    "ASSERT_MY_PARENT_ID",
+    "ASSERT_MY_PUZZLEHASH",
+    "ASSERT_MY_AMOUNT",
+    "ASSERT_SECONDS_RELATIVE",
+    "ASSERT_SECONDS_ABSOLUTE",
+    "ASSERT_HEIGHT_RELATIVE",
+    "ASSERT_HEIGHT_ABSOLUTE",
+    "REMARK"
   ];
 
   List<String> get includeFilesNames => _includeFilesNames;
@@ -65,8 +85,8 @@ class PlaygroundProvider extends ChangeNotifier {
         file.writeContent(outputStream);
         outputStream.close();
       }
-      if (!file.name.contains("puzzles/")) {
-        _includeFilesNames.add(file.name);
+      if (file.name != ("puzzles/")) {
+        _includeFilesNames.add(file.name.replaceAll("puzzles/", ""));
       }
     }
     puzzleFile.deleteSync();
