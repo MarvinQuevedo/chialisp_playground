@@ -60,7 +60,7 @@ class _EditorPageState extends State<EditorPage> {
               IconButton(
                 onPressed: () => _saveFile(context),
                 icon: const Icon(Ionicons.save),
-                iconSize: 40,
+                iconSize: 35,
               ),
               IconButton(
                 onPressed: () => _openRunPage(context),
