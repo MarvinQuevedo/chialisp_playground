@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../editor/models/run_type.dart';
 import '../../../editor/presentation/pages/editor_page.dart';
+import '../../../editor/providers/playground_provider.dart';
+import '../../../editor/utils/default_clsp_project.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,19 +16,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return const EditorPage(
-      orignalCode: """
-; ChiaTk ChiaLisp 
-; Playground experiments
-
-(mod (number)
-    (defun square (number)
-        (* number number)
-    )
-
-    (square number)
-)""",
-      runType: RunType.run,
-    );
+    return Consumer<PlaygroundProvider>(builder: (context, provider, child) {
+      return EditorPage(
+        orignalCode: provider.activeProjectCode ?? defaultCslpProject,
+        runType: RunType.run,
+      );
+    });
   }
 }
