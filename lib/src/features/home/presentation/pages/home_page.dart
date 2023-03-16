@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<PlaygroundProvider>(builder: (context, provider, child) {
       return EditorPage(
-        orignalCode: provider.activeProjectCode ?? defaultCslpProject,
+        orignalCode: provider.activeProjectCode ?? defaultClspProject,
         runType: RunType.run,
       );
     });
