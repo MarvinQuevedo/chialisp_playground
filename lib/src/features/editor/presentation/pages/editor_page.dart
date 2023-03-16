@@ -45,18 +45,19 @@ class _EditorPageState extends State<EditorPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final playProvider = Provider.of<PlaygroundProvider>(context);
     return SafeArea(
-      
       child: Container(
         color: theme['root']!.backgroundColor,
         child: Scaffold(
           backgroundColor: theme['root']!.backgroundColor,
           appBar: AppBar(
             backgroundColor: const Color.fromARGB(255, 14, 15, 13),
-            title: const Text("ChiaLisp Playground"),
+            title:
+                Text(playProvider.activeProjectName ?? "ChiaLisp Playground"),
             elevation: 0,
             actions: [
-               IconButton(
+              IconButton(
                 onPressed: () => _saveFile(context),
                 icon: const Icon(Ionicons.save),
                 iconSize: 40,
@@ -68,7 +69,7 @@ class _EditorPageState extends State<EditorPage> {
               ),
             ],
           ),
-          drawer:const EditorDrawer() ,
+          drawer: const EditorDrawer(),
           body: ListView(
             padding: const EdgeInsets.only(top: 0),
             children: [
@@ -93,14 +94,13 @@ class _EditorPageState extends State<EditorPage> {
             ],
           ),
           bottomSheet: Container(
-          
-            color:  const Color.fromARGB(255, 14, 15, 13),
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+            color: const Color.fromARGB(255, 14, 15, 13),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
             width: size.width,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                      
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ActionButton(
@@ -153,9 +153,29 @@ class _EditorPageState extends State<EditorPage> {
       ),
     );
   }
-  
-  _saveFile(BuildContext context) {
-    showSaveFileDialog(context, _controller.text);
+
+  _saveFile(BuildContext context) async {
+    final playProvider =
+        Provider.of<PlaygroundProvider>(context, listen: false);
+    final activeProject = playProvider.activeProject;
+    if (activeProject == null) {
+      showSaveFileDialog(context, _controller.text);
+    } else {
+      final fileName = activeProject.path.split("/").last;
+      await playProvider.saveProject(fileName, _controller.text);
+      // ignore: use_build_context_synchronously
+      showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+                title: const Text("File saved"),
+                content: const Text("The file was saved successfully"),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Ok"))
+                ],
+              ));
+    }
   }
 }
 
