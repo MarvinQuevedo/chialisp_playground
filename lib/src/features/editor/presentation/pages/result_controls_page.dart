@@ -175,7 +175,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
         });
     playgroundProvider.includePuzzleFiles(_includedFiles).then((value) {
       final playgroundPath = playgroundProvider.playgroundInclude;
-      ChiaToolsCmds.run([cleanedCode, '-i', playgroundPath]).then((value) {
+      ChiaToolsCmds.run([widget.code, '-i', playgroundPath]).then((value) {
         setState(() {
           showOutput = true;
           outputText = value;
@@ -191,7 +191,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
         Provider.of<PlaygroundProvider>(context, listen: false);
     playgroundProvider.includePuzzleFiles(_includedFiles).then((value) {
       final playgroundPath = playgroundProvider.playgroundInclude;
-      ChiaToolsCmds.run([cleanedCode, '-i', playgroundPath]).then((value) {
+      ChiaToolsCmds.run([widget.code, '-i', playgroundPath]).then((value) {
         final args = argsControllers.map((e) => e.text).join(" ");
         ChiaToolsCmds.brun([value, "($args)", '-i', playgroundPath])
             .then((value) {
