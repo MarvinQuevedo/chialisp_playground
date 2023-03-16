@@ -1,5 +1,12 @@
+ 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/svg.dart'; 
+import 'package:provider/provider.dart';
+
+import '../../../home/presentation/pages/home_page.dart';
+import '../../providers/playground_provider.dart';
+import '../../utils/save_file_dialog.dart';
+import '../pages/projects_page.dart';
 
 class EditorDrawer extends StatelessWidget {
   const EditorDrawer({super.key});
@@ -45,8 +52,18 @@ class EditorDrawer extends StatelessWidget {
               ],
             )),
         ListTile(
+          leading: const Icon(Icons.add, color: Colors.white),
+          title:
+              const Text("New file", style: TextStyle(color: Colors.white)),
+          trailing: const Icon(
+            Icons.keyboard_arrow_right,
+            color: Colors.white,
+          ),
+          onTap: () => _createNewProject(context),
+        ),
+        ListTile(
           leading: const Icon(Icons.list, color: Colors.white),
-          title: const Text("Projects", style: TextStyle(color: Colors.white)),
+          title: const Text("Files", style: TextStyle(color: Colors.white)),
           trailing: const Icon(
             Icons.keyboard_arrow_right,
             color: Colors.white,
@@ -57,5 +74,24 @@ class EditorDrawer extends StatelessWidget {
     );
   }
 
-  _openProjectsPage(BuildContext context) {}
+  _openProjectsPage(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const ProjectsPage()));
+  }
+
+  _createNewProject(BuildContext context) {
+    showSaveFileDialog(context, "").then((result) {
+      if (result != null) {
+        final playProvider =
+            Provider.of<PlaygroundProvider>(context, listen: false);
+        playProvider.loadProjectWithFilename(result).then((value) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const HomePage(),
+              ),
+              (route) => false);
+        });
+      }
+    });
+  }
 }
