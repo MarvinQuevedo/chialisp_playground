@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chialisp_playground/src/features/editor/presentation/pages/result_controls_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -27,16 +29,19 @@ class _EditorPageState extends State<EditorPage> {
   String? lastCode;
   late final CodeController _controller;
   Map<String, TextStyle> theme = monokaiSublimeTheme;
+  late final FocusNode _editorFocusNode;
+  bool _editorInitialized = false;
 
   @override
   void initState() {
+    _editorFocusNode = FocusNode();
     _controller = CodeController(
       text: widget.orignalCode, // Initial code
       language: chiaLisp,
     );
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _addPersonalizedAutocomplements();
+      _initEditor();
     });
 
     super.initState();
@@ -81,6 +86,7 @@ class _EditorPageState extends State<EditorPage> {
                   width: size.width,
                   child: CodeField(
                     controller: _controller,
+                    focusNode: _editorFocusNode,
                     lineNumberBuilder: (number, style) {
                       return TextSpan(
                         text: number.toString(),
@@ -133,48 +139,68 @@ class _EditorPageState extends State<EditorPage> {
     );
   }
 
-  void _addPersonalizedAutocomplements() {
+  void _initEditor() {
     final playPro = Provider.of<PlaygroundProvider>(context, listen: false);
     _controller.autocompleter.setCustomWords(playPro.includeFilesNames);
+    _editorFocusNode.addListener(_forceInitializedEditor);
+    FocusScope.of(context).requestFocus(_editorFocusNode);
+  }
+
+  void _forceInitializedEditor() {
+    if (_editorFocusNode.hasFocus && !_editorInitialized) {
+      _controller.insertStr(" ");
+      _controller.removeChar();
+      _editorInitialized = true;
+      _editorFocusNode.removeListener(_forceInitializedEditor);
+    }
   }
 
   void _addChar(value) {
     _controller.insertStr(value);
   }
 
-  _openRunPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultControlsPage(
-          code: _controller.text,
-          theme: theme,
+  _openRunPage(BuildContext context) async {
+    final playProvider =
+        Provider.of<PlaygroundProvider>(context, listen: false);
+    final activeProject = playProvider.activeProject;
+
+    if (activeProject == null) {
+      await _saveFile(context, title: "Save file first");
+    } else {
+      playProvider.saveProject(
+        activeProject.path.split("/").last,
+        _controller.text,
+      );
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultControlsPage(
+            code: _controller.text,
+            theme: theme,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
-  _saveFile(BuildContext context) async {
+  Future<String?> _saveFile(BuildContext context,
+      {String title = 'Save file'}) async {
     final playProvider =
         Provider.of<PlaygroundProvider>(context, listen: false);
     final activeProject = playProvider.activeProject;
     if (activeProject == null) {
-      showSaveFileDialog(context, _controller.text);
+      return showSaveFileDialog(context, _controller.text, title: title);
     } else {
       final fileName = activeProject.path.split("/").last;
       await playProvider.saveProject(fileName, _controller.text);
       // ignore: use_build_context_synchronously
-      showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-                title: const Text("File saved"),
-                content: const Text("The file was saved successfully"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Ok"))
-                ],
-              ));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("File saved"),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ));
+      return null;
     }
   }
 }
