@@ -80,7 +80,7 @@ class EditorDrawer extends StatelessWidget {
   }
 
   _createNewProject(BuildContext context) {
-    showSaveFileDialog(context, "").then((result) {
+    showSaveFileDialog(context, "", title: "Create new file").then((result) {
       if (result != null) {
         final playProvider =
             Provider.of<PlaygroundProvider>(context, listen: false);
