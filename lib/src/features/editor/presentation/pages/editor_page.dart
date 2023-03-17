@@ -13,6 +13,7 @@ import 'package:ionicons/ionicons.dart';
 
 import '../../utils/monokaiSublimeThemeWithFont.dart';
 import '../../utils/save_file_dialog.dart';
+import '../../utils/snackbar.dart';
 import '../widgets/editor_drawer.dart';
 
 class EditorPage extends StatefulWidget {
@@ -195,10 +196,9 @@ class _EditorPageState extends State<EditorPage> {
       final fileName = activeProject.path.split("/").last;
       await playProvider.saveProject(fileName, _controller.text);
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(  const MeSnackbar(
         content: Text("File saved"),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
+ 
       ));
       return null;
     }

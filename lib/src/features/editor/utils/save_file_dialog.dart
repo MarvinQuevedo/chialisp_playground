@@ -4,6 +4,7 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/playground_provider.dart';
+import 'snackbar.dart';
 
 Future<String?> showSaveFileDialog(BuildContext context, String content,
     {String title = "Save file"}) async {
@@ -81,10 +82,10 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
     );
 
     // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
       content: Text("File saved"),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
+ 
+      duration: Duration(seconds: 2),
     ));
     return fileName + ".clsp";
   }

@@ -13,6 +13,7 @@ import '../../utils/chialisp_obtain_include_files.dart';
 import '../../utils/chialisp_parser.dart';
 import '../../utils/chialisp_remove_comments.dart';
 import '../../utils/error_dialog.dart';
+import '../../utils/snackbar.dart';
 
 enum _OutputType {
   compile,
@@ -391,7 +392,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     Clipboard.setData(ClipboardData(text: text));
     //show snackbar
     Future.microtask(() => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          const MeSnackbar(
             content: Text("Copied to clipboard"),
             duration: Duration(seconds: 1),
           ),
