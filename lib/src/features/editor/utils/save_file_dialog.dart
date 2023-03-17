@@ -83,8 +83,7 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
 
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
-      content: Text("File saved"),
- 
+      content: Text("File saved", style: TextStyle(color: Colors.white)),
       duration: Duration(seconds: 2),
     ));
     return fileName + ".clsp";

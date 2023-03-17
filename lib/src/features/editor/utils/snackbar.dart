@@ -6,5 +6,5 @@ class MeSnackbar extends SnackBar {
     required super.content,
     Duration duration = const Duration(milliseconds: 2500),
     Color backgroundColor = const Color(0xff04395e),
-  }) : super(duration: duration, backgroundColor: backgroundColor,);
+  }) : super(duration: duration, backgroundColor: backgroundColor);
 }

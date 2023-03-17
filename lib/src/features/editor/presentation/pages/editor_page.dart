@@ -197,7 +197,7 @@ class _EditorPageState extends State<EditorPage> {
       await playProvider.saveProject(fileName, _controller.text);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(  const MeSnackbar(
-        content: Text("File saved"),
+        content: Text("File saved", style: TextStyle(color: Colors.white)),
  
       ));
       return null;

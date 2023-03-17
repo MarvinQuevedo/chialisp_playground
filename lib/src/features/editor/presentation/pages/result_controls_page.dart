@@ -393,7 +393,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     //show snackbar
     Future.microtask(() => ScaffoldMessenger.of(context).showSnackBar(
           const MeSnackbar(
-            content: Text("Copied to clipboard"),
+            content: Text("Copied to clipboard", style: TextStyle(color: Colors.white)),
             duration: Duration(seconds: 1),
           ),
         ));
