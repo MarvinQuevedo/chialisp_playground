@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.chialisp_playground">
+       <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="chialisp_playground"
         android:name="${applicationName}"
