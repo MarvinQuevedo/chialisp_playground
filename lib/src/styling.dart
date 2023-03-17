@@ -1,53 +1,52 @@
 import 'package:flutter/material.dart';
- 
 
 class ThemeDartText {
   ThemeDartText._internal();
-  static const Color darkText = const Color(0xffffffff);
-  static const Color darkerText = const Color(0xFFBAC7CE);
-  static const Color lightText = const Color(0x80e5f0f4);
-  static const Color captionText = const Color(0xFFDDDDDD);
+  static const Color darkText = Color(0xffffffff);
+  static const Color darkerText = Color(0xFFBAC7CE);
+  static const Color lightText = Color(0x80e5f0f4);
+  static const Color captionText = Color(0xFFDDDDDD);
 }
 
 class ThemeLigthText {
   ThemeLigthText._internal();
-  static final Color darkText = Color(0xff23262f);
+  static const Color darkText = Color(0xff23262f);
   static const Color darkerText = Color(0xFF17262A);
-  static final Color lightText = Color(0xff969aa0);
+  static const Color lightText = Color(0xff969aa0);
 }
 
 class ThemeComponentsDarkColor {
   ThemeComponentsDarkColor._internal();
-  static final Color disabledColor = AppTheme.deactivatedText;
-  static final Color disabledButtonColor = Color(0xFF727070);
-  static final Color unselectedWidgetColor = AppTheme.nearlyWhite;
-  static final Color toggleableActiveColor = AppTheme.secondaryLigth;
+  static const Color disabledColor = AppTheme.deactivatedText;
+  static const Color disabledButtonColor = Color(0xFF727070);
+  static const Color unselectedWidgetColor = AppTheme.nearlyWhite;
+  static const Color toggleableActiveColor = AppTheme.secondaryLigth;
 }
 
 class ThemeComponentsLigthColor {
   ThemeComponentsLigthColor._internal();
-  static final Color disabledColor = Color(0xFFB4B4B4);
-  static final Color disabledButtonColor = Color(0xFF727070);
-  static final Color unselectedWidgetColor = Color(0x4d06ffb2);
+  static const Color disabledColor = Color(0xFFB4B4B4);
+  static const Color disabledButtonColor = Color(0xFF727070);
+  static const Color unselectedWidgetColor = Color(0x4d06ffb2);
 
-  static final Color toggleableActiveColor = AppTheme.secondaryLigth;
+  static const Color toggleableActiveColor = AppTheme.secondaryLigth;
 }
 
 class AppTheme {
   AppTheme._();
 
-  static const Color primary = Color(0xFF75D811);
+  static const Color primary = Color(0xffa6e22e);
   static const Color red = Color(0xFFEB5050);
-  static const Color primaryVariant = Color(0xFF75D811);
-  static const Color secondaryLigth = Color(0xFF75D811);
-  static const Color secondaryDark = Color(0xFF75D811);
+  static const Color primaryVariant = Color(0xffa6e22e);
+  static const Color secondaryLigth = Color(0xffa6e22e);
+  static const Color secondaryDark = Color(0xffa6e22e);
 
   static const Color notWhite = Color(0xFFEDF0F2);
   static const Color nearlyWhite = Color(0xFFFEFEFE);
   static const Color white = Color(0xFFFFFFFF);
   static const Color nearlyBlack = Color(0xFF101018);
   static const Color grey = Color(0xFF3A5160);
-  static const Color dark_grey = Color(0xFF313A44);
+  static const Color darkGrey = Color(0xFF313A44);
 
   static const Color deactivatedText = Color(0xFF080606);
   static const Color dismissibleBackground = Color(0xFF364A54);
@@ -55,33 +54,32 @@ class AppTheme {
   static const Color spacer = Color(0xFFF2F2F2);
 
   static final TextTheme textThemeDark = TextTheme(
-    headline4: display1Ligth.copyWith(
+    headlineMedium: display1Ligth.copyWith(
       color: ThemeDartText.darkerText,
     ),
-    button: button.copyWith(color: ThemeLigthText.darkerText),
-    headline5: headline.copyWith(color: ThemeDartText.darkerText),
-    headline6: title.copyWith(color: ThemeDartText.darkerText),
-    subtitle2: subtitle.copyWith(color: ThemeDartText.darkText),
-    bodyText1: body2.copyWith(color: ThemeDartText.darkText),
-    bodyText2: body1.copyWith(color: ThemeDartText.darkText),
-    caption: caption.copyWith(color: ThemeDartText.captionText),
+    labelLarge: button.copyWith(color: ThemeLigthText.darkerText),
+    headlineSmall: headline.copyWith(color: ThemeDartText.darkerText),
+    titleLarge: title.copyWith(color: ThemeDartText.darkerText),
+    titleSmall: subtitle.copyWith(color: ThemeDartText.darkText),
+    bodyLarge: body2.copyWith(color: ThemeDartText.darkText),
+    bodyMedium: body1.copyWith(color: ThemeDartText.darkText),
+    bodySmall: caption.copyWith(color: ThemeDartText.captionText),
   );
 
-  static TextTheme textThemeLigth =
-      TextTheme(
-    button: button.copyWith(color: ThemeLigthText.darkerText),
-    headline4: display1Ligth,
-    headline5: headline,
-    headline6: title,
-    subtitle2: subtitle,
-    bodyText1: body2,
-    bodyText2: body1,
-    caption: caption,
+  static TextTheme textThemeLigth = TextTheme(
+    labelLarge: button.copyWith(color: ThemeLigthText.darkerText),
+    headlineMedium: display1Ligth,
+    headlineSmall: headline,
+    titleLarge: title,
+    titleSmall: subtitle,
+    bodyLarge: body2,
+    bodyMedium: body1,
+    bodySmall: caption,
   );
 
   static const _family = "Roboto";
 
-  static final TextStyle display1Ligth = TextStyle(
+  static const TextStyle display1Ligth = TextStyle(
     // h4 -> display1
 
     fontWeight: FontWeight.bold,
@@ -91,7 +89,7 @@ class AppTheme {
     color: ThemeLigthText.darkerText,
   );
 
-  static final TextStyle headline =TextStyle(
+  static const TextStyle headline = TextStyle(
     // h5 -> headline
 
     fontWeight: FontWeight.bold,
@@ -100,7 +98,7 @@ class AppTheme {
     color: ThemeLigthText.darkerText,
   );
 
-  static final TextStyle title = TextStyle(
+  static const TextStyle title = TextStyle(
     // h6 -> title
 
     fontWeight: FontWeight.bold,
@@ -127,7 +125,7 @@ class AppTheme {
     color: ThemeLigthText.darkText,
   );
 
-  static final TextStyle body1 =TextStyle(
+  static final TextStyle body1 = TextStyle(
     // body2 -> body1
 
     fontWeight: FontWeight.w400,
