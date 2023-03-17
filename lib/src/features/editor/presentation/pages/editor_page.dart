@@ -1,6 +1,4 @@
-import 'dart:io';
-
-import 'package:chialisp_playground/src/features/editor/presentation/pages/result_controls_page.dart';
+import 'result_controls_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
@@ -131,6 +129,21 @@ class _EditorPageState extends State<EditorPage> {
                     value: ";",
                     child: const Text(";"),
                   ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: ".",
+                    child: const Text("."),
+                  ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: "'",
+                    child: const Text("'"),
+                  ),
+                  ActionButton(
+                    onPressed: _addChar,
+                    value: "\"",
+                    child: const Text("\""),
+                  ),
                 ],
               ),
             ),
@@ -196,9 +209,8 @@ class _EditorPageState extends State<EditorPage> {
       final fileName = activeProject.path.split("/").last;
       await playProvider.saveProject(fileName, _controller.text);
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(  const MeSnackbar(
+      ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
         content: Text("File saved", style: TextStyle(color: Colors.white)),
- 
       ));
       return null;
     }
