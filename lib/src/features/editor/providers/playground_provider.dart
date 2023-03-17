@@ -83,6 +83,12 @@ class PlaygroundProvider extends ChangeNotifier {
 
     projectsDir.listSync().forEach((element) {
       if (element is File) {
+        final fileName = element.path.split("/").last;
+        final ext = fileName.split(".").last;
+        if (ext == "zip") {
+          element.delete();
+          return;
+        }
         _projects?.add(element);
         _includeFilesNames.add(element.path.split("/").last);
       }
