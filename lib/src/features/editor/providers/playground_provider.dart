@@ -22,7 +22,7 @@ class PlaygroundProvider extends ChangeNotifier {
   String? _activeProjectCode;
   String? get activeProjectCode => _activeProjectCode;
 
-  final List<String> _includeFilesNames = [
+  List<String> _includeFilesNames = [
     "include",
     "defconstant",
     "defun",
@@ -84,22 +84,41 @@ class PlaygroundProvider extends ChangeNotifier {
     projectsDir.listSync().forEach((element) {
       if (element is File) {
         _projects?.add(element);
+        _includeFilesNames.add(element.path.split("/").last);
       }
     });
+    _includeFilesNames = _includeFilesNames.toSet().toList();
     notifyListeners();
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
+    List<String> notFounds = [];
     for (var puzzleFile in puzzleFiles) {
       final file = File('${_appDocDir.absolute.path}/puzzles/$puzzleFile');
-      final playgroundFile = File('${playgroundDir.absolute.path}/$puzzleFile');
+
       if (!file.existsSync()) {
-        return Future.error(puzzleFile);
+        // return Future.error(puzzleFile);
+        notFounds.add(puzzleFile);
+        continue;
       }
+      final playgroundFile = File('${playgroundDir.absolute.path}/$puzzleFile');
       if (playgroundFile.existsSync()) {
         await playgroundFile.delete();
       }
       playgroundFile.writeAsBytesSync(file.readAsBytesSync());
+    }
+
+    final projectsDir = Directory('${_appDocDir.absolute.path}/projects');
+    for (final puzzleFile in notFounds) {
+      final projectFile = File('${projectsDir.absolute.path}/$puzzleFile');
+      if (!projectFile.existsSync()) {
+        return Future.error(puzzleFile);
+      }
+      final playgroundFile = File('${playgroundDir.absolute.path}/$puzzleFile');
+      if (playgroundFile.existsSync()) {
+        await playgroundFile.delete();
+      }
+      playgroundFile.writeAsBytesSync(projectFile.readAsBytesSync());
     }
     return true;
   }
