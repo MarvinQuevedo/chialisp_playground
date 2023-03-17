@@ -1,10 +1,12 @@
+import 'package:chialisp_playground/src/features/editor/utils/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/playground_provider.dart';
 
-Future<String?> showSaveFileDialog(BuildContext context, String content) async {
+Future<String?> showSaveFileDialog(BuildContext context, String content,
+    {String title = "Save file"}) async {
   //show dialog for insert name with TextEditingController
   final textController = TextEditingController();
   final tagColor = monokaiSublimeTheme['tag']!.color!;
@@ -14,7 +16,7 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Save File", style: TextStyle(color: Colors.white)),
+          title: Text(title, style: const TextStyle(color: Colors.white)),
           backgroundColor: monokaiSublimeTheme['root']!.backgroundColor,
           content: Row(
             children: [
@@ -58,7 +60,11 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, textController.text);
+                if (textController.text.trim().isEmpty) {
+                  showError("Filename can't be empty", context);
+                } else {
+                  Navigator.pop(context, textController.text);
+                }
               },
               child: Text(
                 "Save",
@@ -73,31 +79,13 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
       fileName + ".clsp",
       content,
     );
+
     // ignore: use_build_context_synchronously
-    await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title:
-                const Text("Save File", style: TextStyle(color: Colors.white)),
-            backgroundColor: monokaiSublimeTheme['root']!.backgroundColor,
-            content: const Text(
-              "File saved successfully",
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, true);
-                },
-                child: Text(
-                  "Ok",
-                  style: TextStyle(color: tagColor),
-                ),
-              ),
-            ],
-          );
-        });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("File saved"),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 3),
+    ));
     return fileName + ".clsp";
   }
   return null;
