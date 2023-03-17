@@ -58,7 +58,6 @@ class PlaygroundProvider extends ChangeNotifier {
     }
     return _activeProject?.path.split("/").last;
   }
-  
 
   Future<void> init(AssetBundle rootBundle) async {
     _appDocDir = await getApplicationDocumentsDirectory();
@@ -150,16 +149,52 @@ class PlaygroundProvider extends ChangeNotifier {
     _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
     return fileData;
   }
-  Future<String> loadProjectWithFilename(String fileName)async{
+
+  Future<String> loadProjectWithFilename(String fileName) async {
     final file = File('${_appDocDir.absolute.path}/projects/$fileName');
     return await loadProject(file);
   }
 
   Future<bool> saveProject(String fileName, String content) async {
     final file = File('${_appDocDir.absolute.path}/projects/$fileName');
-   
+
     await file.writeAsString(content);
     await loadProjects();
+    await loadProject(file);
     return true;
+  }
+
+  Future<File> genereSharedActiveProject(
+      String code, List outputs, List<String> puzzleFiles) async {
+    final file = _activeProject!;
+    await file.writeAsString(code);
+    await includePuzzleFiles(puzzleFiles);
+    List<File> includeFiles = [];
+    playgroundDir.listSync().forEach((element) {
+      if (element is File) {
+        includeFiles.add(element);
+      }
+    });
+    final zipFile = File(
+        '${_appDocDir.absolute.path}/projects/${file.path.split("/").last}.zip');
+    if (zipFile.existsSync()) {
+      await zipFile.delete();
+    }
+    final archive = ZipFileEncoder();
+    archive.create(zipFile.absolute.path);
+    for (final file in includeFiles) {
+      final fileName = file.path.split("/").last;
+      final includeFilename = "include/$fileName";
+      await archive.addFile(file, includeFilename);
+    }
+    await archive.addFile(file);
+    final outputStr = outputs.join("\n");
+    final output = File('${playgroundDir.absolute.path}/output.txt');
+    await output.writeAsString(outputStr);
+    await archive.addFile(output);
+    archive.close();
+    await output.delete();
+
+    return zipFile;
   }
 }
