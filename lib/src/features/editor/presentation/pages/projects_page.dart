@@ -57,10 +57,10 @@ class _ProjectsPageState extends State<ProjectsPage> {
     );
   }
 
-  void _openProject(File file, BuildContext context) {
+  void _openProject(File file, BuildContext context) async{
     final provider = Provider.of<PlaygroundProvider>(context, listen: false);
 
-    provider.loadProject(file);
+    await provider.loadProject(file);
     _goToHomePage();
   }
 
