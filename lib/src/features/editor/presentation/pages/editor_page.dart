@@ -61,6 +61,16 @@ class _EditorPageState extends State<EditorPage> {
                 Text(playProvider.activeProjectName ?? "ChiaLisp Playground"),
             elevation: 0,
             actions: [
+               IconButton(
+                onPressed: () => _undoCode(context),
+                icon: const Icon(Ionicons.arrow_undo),
+                iconSize: 30,
+              ),
+               IconButton(
+                onPressed: () => _redoCode(context),
+                icon: const Icon(Ionicons.arrow_redo),
+                iconSize: 30,
+              ),
               IconButton(
                 onPressed: () => _saveFile(context),
                 icon: const Icon(Ionicons.save),
@@ -214,6 +224,14 @@ class _EditorPageState extends State<EditorPage> {
       ));
       return null;
     }
+  }
+  
+  _undoCode(BuildContext context) {
+    _controller.historyController.undo();
+  }
+  
+  _redoCode(BuildContext context) {
+    _controller.historyController.redo();
   }
 }
 
