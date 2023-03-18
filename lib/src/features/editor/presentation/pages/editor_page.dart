@@ -1,3 +1,5 @@
+import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
+
 import 'result_controls_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -192,7 +194,7 @@ class _EditorPageState extends State<EditorPage> {
       await _saveFile(context, title: "Save file first");
     } else {
       playProvider.saveProject(
-        activeProject.path.split("/").last,
+        fileName(activeProject.path)  ,
         _controller.text,
       );
       // ignore: use_build_context_synchronously
@@ -216,8 +218,8 @@ class _EditorPageState extends State<EditorPage> {
     if (activeProject == null) {
       return showSaveFileDialog(context, _controller.text, title: title);
     } else {
-      final fileName = activeProject.path.split("/").last;
-      await playProvider.saveProject(fileName, _controller.text);
+    
+      await playProvider.saveProject(fileName(activeProject.path), _controller.text);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
         content: Text("File saved", style: TextStyle(color: Colors.white)),

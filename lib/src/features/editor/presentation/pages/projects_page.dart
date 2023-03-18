@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../home/presentation/pages/home_page.dart';
+import '../../utils/dir_splitter.dart';
 
 class ProjectsPage extends StatefulWidget {
   const ProjectsPage({super.key});
@@ -38,7 +39,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
                     itemCount: provider.projects!.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(filename(provider.projects![index])),
+                        title: Text(fileName(provider.projects![index].path)),
                         subtitle:
                             Text(formatFileDate(provider.projects![index])),
                         onTap: () {
@@ -72,9 +73,7 @@ class _ProjectsPageState extends State<ProjectsPage> {
         (route) => false);
   }
 
-  String filename(File file) {
-    return file.path.split("/").last;
-  }
+ 
 
   String formatFileDate(File file) {
     final date = file.lastModifiedSync();
