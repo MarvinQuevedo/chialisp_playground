@@ -157,7 +157,7 @@ class PlaygroundProvider extends ChangeNotifier {
         outputStream.close();
       }
       if (file.name != ("puzzles$_DS")) {
-        _includeFilesNames.add(file.name.replaceAll("puzzles$_DS", ""));
+        _includeFilesNames.add(file.name.replaceAll("puzzles/", ""));
       }
     }
     try {
