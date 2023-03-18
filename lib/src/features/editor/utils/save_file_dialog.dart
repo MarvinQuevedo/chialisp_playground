@@ -23,25 +23,31 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
             children: [
               Expanded(
                 child: TextField(
-                  controller: textController,
-                  decoration: InputDecoration(
-                    labelText: "Insert file name",
-                    labelStyle: const TextStyle(
-                      color: Colors.white,
+                    controller: textController,
+                    decoration: InputDecoration(
+                      labelText: "Insert file name",
+                      labelStyle: const TextStyle(
+                        color: Colors.white,
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      fillColor: monokaiSublimeTheme['tag']!.backgroundColor,
                     ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    fillColor: monokaiSublimeTheme['tag']!.backgroundColor,
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                ),
+                    style: const TextStyle(color: Colors.white),
+                    onSubmitted: (_) {
+                      if (textController.text.trim().isEmpty) {
+                        showError("Filename can't be empty", context);
+                      } else {
+                        Navigator.pop(context, textController.text);
+                      }
+                    }),
               ),
               const Text(
                 ".clsp",

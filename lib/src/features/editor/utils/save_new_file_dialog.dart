@@ -3,6 +3,7 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/playground_provider.dart';
+import 'error_dialog.dart';
 
 Future<String?> showSaveFileDialog(BuildContext context, String content) async {
   //show dialog for insert name with TextEditingController
@@ -20,25 +21,31 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
             children: [
               Expanded(
                 child: TextField(
-                  controller: textController,
-                  decoration: InputDecoration(
-                    labelText: "Insert file name",
-                    labelStyle: const TextStyle(
-                      color: Colors.white,
+                    controller: textController,
+                    decoration: InputDecoration(
+                      labelText: "Insert file name",
+                      labelStyle: const TextStyle(
+                        color: Colors.white,
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      border: UnderlineInputBorder(
+                        borderSide: BorderSide(color: tagColor),
+                      ),
+                      fillColor: monokaiSublimeTheme['tag']!.backgroundColor,
                     ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(color: tagColor),
-                    ),
-                    fillColor: monokaiSublimeTheme['tag']!.backgroundColor,
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                ),
+                    style: const TextStyle(color: Colors.white),
+                    onSubmitted: (_) {
+                      if (textController.text.trim().isEmpty) {
+                        showError("Filename can't be empty", context);
+                      } else {
+                        Navigator.pop(context, textController.text);
+                      }
+                    }),
               ),
               const Text(
                 ".clsp",
@@ -58,7 +65,11 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, textController.text);
+                if (textController.text.trim().isEmpty) {
+                  showError("Filename can't be empty", context);
+                } else {
+                  Navigator.pop(context, textController.text);
+                }
               },
               child: Text(
                 "Save",
@@ -74,7 +85,7 @@ Future<String?> showSaveFileDialog(BuildContext context, String content) async {
       content,
     );
     // ignore: use_build_context_synchronously
-   
+
     return fileName + ".clsp";
   }
   return null;
