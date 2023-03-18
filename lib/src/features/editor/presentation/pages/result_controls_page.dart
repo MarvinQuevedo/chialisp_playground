@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
+import 'package:file_picker/file_picker.dart'; 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -393,7 +397,8 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     //show snackbar
     Future.microtask(() => ScaffoldMessenger.of(context).showSnackBar(
           const MeSnackbar(
-            content: Text("Copied to clipboard", style: TextStyle(color: Colors.white)),
+            content: Text("Copied to clipboard",
+                style: TextStyle(color: Colors.white)),
             duration: Duration(seconds: 1),
           ),
         ));
@@ -409,20 +414,36 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
 
     final fileToShare = await playgroundProvider.genereSharedActiveProject(
         widget.code, _outputs, _includedFiles);
-    final xFile = XFile(
-      fileToShare.path,
-      mimeType: 'application/zip',
-      name: fileToShare.path.split('/').last,
-      bytes: await fileToShare.readAsBytes(),
-      lastModified: fileToShare.lastModifiedSync(),
-      length: fileToShare.lengthSync(),
-    );
-    final activeProjectName = playgroundProvider.activeProjectName;
 
-    Share.shareXFiles([xFile], text: activeProjectName);
-    setState(() {
-      building = false;
-    });
+    if (Platform.isWindows) {
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: 'Please select an output file:',
+        fileName: fileName("${fileToShare.path}.zip"),
+      );
+
+      if (outputFile != null) {
+        await fileToShare.copy(outputFile);
+      }
+
+      setState(() {
+        building = false;
+      });
+    } else {
+      final xFile = XFile(
+        fileToShare.path,
+        mimeType: 'application/zip',
+        name: fileName(fileToShare.path),
+        bytes: await fileToShare.readAsBytes(),
+        lastModified: fileToShare.lastModifiedSync(),
+        length: fileToShare.lengthSync(),
+      );
+      final activeProjectName = playgroundProvider.activeProjectName;
+
+      Share.shareXFiles([xFile], text: activeProjectName);
+      setState(() {
+        building = false;
+      });
+    }
   }
 }
 

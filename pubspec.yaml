@@ -31,12 +31,15 @@ dependencies:
   flutter:
     sdk: flutter
   #flutter_code_editor: ^0.2.13
-  flutter_code_editor: 
-    path: ../flutter-code-editor  
+ 
   highlight: ^0.7.0 
-  
+  flutter_code_editor:
+    git:
+      url: https://github.com/MarvinQuevedo/flutter-code-editor.git
+      ref: main
   flutter_chia_rust_utils:
     path: ../chia_rs/flutter-binding/flutter_chia_rust_utils 
+  file_picker: ^5.2.6
  
   
 
@@ -54,6 +57,7 @@ dependencies:
   flutter_svg: ^2.0.4
   shared_preferences: ^2.0.18
   share_plus: ^6.3.1
+  
 
 dev_dependencies:
   flutter_test:
