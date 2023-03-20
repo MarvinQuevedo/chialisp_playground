@@ -2,11 +2,12 @@
 
 import 'dart:io';
 import 'dart:developer' as developer;
-import 'dart:typed_data';
 
 import 'package:archive/archive_io.dart';
+import 'package:chialisp_playground/src/features/editor/utils/default_clsp_project.dart';
 import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,8 +17,10 @@ final _DS = dirSplitter;
 class PlaygroundProvider extends ChangeNotifier {
   late final Directory _appDocDir;
   late final Directory playgroundDir;
-  List<File>? _projects;
-  List<File>? get projects => _projects;
+  final CodeController _controller;
+
+  PlaygroundProvider(this._controller);
+
   File? _activeProject;
   File? get activeProject => _activeProject;
 
@@ -47,10 +50,9 @@ class PlaygroundProvider extends ChangeNotifier {
     "ASSERT_HEIGHT_ABSOLUTE",
     "REMARK"
   ];
+  List<String> get includeFilesNames => _includeFilesNames;
 
   late final SharedPreferences _sharedPreferencfes;
-
-  List<String> get includeFilesNames => _includeFilesNames;
 
   String get playgroundInclude => playgroundDir.absolute.path;
 
@@ -61,52 +63,35 @@ class PlaygroundProvider extends ChangeNotifier {
     return _activeProject?.path.split(_DS).last;
   }
 
-  Future<void> init(AssetBundle rootBundle) async {
-    final appDocDic = await getApplicationDocumentsDirectory();
-    _appDocDir = Directory('${appDocDic.absolute.path}$_DS.chialisp_playground');
-    if (!_appDocDir.existsSync()) {
-      _appDocDir.createSync(recursive: true);
-    }
-    developer.log(_appDocDir.absolute.path);
+  void updateProjectsFilesNames(List<String> projectsFilesNames) {
+    _includeFilesNames.addAll(projectsFilesNames);
+    _includeFilesNames = _includeFilesNames.toSet().toList();
+    _controller.autocompleter.setCustomWords(_includeFilesNames);
+    notifyListeners();
+  }
+
+  Future<void> init(
+      {required AssetBundle rootBundle,
+      required List<String> puzzlesFilesNames,
+      required List<String> projectsFilesNames,
+      required Directory appDocDir}) async {
+    _appDocDir = appDocDir;
+
     playgroundDir = Directory('${_appDocDir.path}${_DS}playground');
     if (playgroundDir.existsSync()) {
       await playgroundDir.delete(recursive: true);
     }
     playgroundDir.createSync(recursive: true);
-    File puzzleFile = File('${_appDocDir.path}${_DS}puzzles.zip');
-    await _unArchivePuzzleFile(puzzleFile, rootBundle);
-    await loadProjects();
+
     _sharedPreferencfes = await SharedPreferences.getInstance();
     await readLastProject();
-  }
-
-  Future<void> loadProjects() async {
-    _projects = [];
-    final projectsDir = Directory('${_appDocDir.absolute.path}${_DS}projects');
-    if (!projectsDir.existsSync()) {
-      projectsDir.createSync(recursive: true);
-    }
-
-    projectsDir.listSync().forEach((element) {
-      if (element is File) {
-        final fileName = element.path.split(_DS).last;
-        final ext = fileName.split(".").last;
-        if (ext == "zip") {
-          element.delete();
-          return;
-        }
-        _projects?.add(element);
-        _includeFilesNames.add(element.path.split(_DS).last);
-      }
-    });
-    _includeFilesNames = _includeFilesNames.toSet().toList();
-    notifyListeners();
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
     List<String> notFounds = [];
     for (var puzzleFile in puzzleFiles) {
-      final file = File('${_appDocDir.absolute.path}${_DS}puzzles${_DS}$puzzleFile');
+      final file =
+          File('${_appDocDir.absolute.path}${_DS}puzzles$_DS$puzzleFile');
 
       if (!file.existsSync()) {
         // return Future.error(puzzleFile);
@@ -126,45 +111,14 @@ class PlaygroundProvider extends ChangeNotifier {
       if (!projectFile.existsSync()) {
         return Future.error(puzzleFile);
       }
-      final playgroundFile = File('${playgroundDir.absolute.path}$_DS$puzzleFile');
+      final playgroundFile =
+          File('${playgroundDir.absolute.path}$_DS$puzzleFile');
       if (playgroundFile.existsSync()) {
         await playgroundFile.delete();
       }
       playgroundFile.writeAsBytesSync(projectFile.readAsBytesSync());
     }
     return true;
-  }
-
-  Future<void> _unArchivePuzzleFile(
-      File puzzleFile, AssetBundle rootBundle) async {
-    if (await puzzleFile.exists()) {
-      await puzzleFile.delete();
-    }
-
-    final ByteData data = await rootBundle.load('assets/puzzles.zip');
-    await puzzleFile.writeAsBytes(
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
-    final inputStream = InputFileStream(puzzleFile.absolute.path);
-    final archive = ZipDecoder().decodeBuffer(inputStream);
-
-    for (var file in archive.files) {
-      if (file.isFile) {
-        if (file.name.contains("__MACOSX")) continue;
-        final outputStream =
-            OutputFileStream('${_appDocDir.absolute.path}/${file.name}');
-
-        file.writeContent(outputStream);
-        outputStream.close();
-      }
-      if (file.name != ("puzzles$_DS")) {
-        _includeFilesNames.add(file.name.replaceAll("puzzles/", ""));
-      }
-    }
-    try {
-      puzzleFile.deleteSync();
-    } catch (e) {
-      developer.log(e.toString());
-    }
   }
 
   Future<void> readLastProject() async {
@@ -174,6 +128,8 @@ class PlaygroundProvider extends ChangeNotifier {
       if (file.existsSync()) {
         await loadProject(file);
       }
+    } else {
+      _controller.text = defaultClspProject;
     }
   }
 
@@ -182,6 +138,7 @@ class PlaygroundProvider extends ChangeNotifier {
     _activeProject = file;
     _activeProjectCode = fileData;
     _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
+    _controller.text = fileData;
     return fileData;
   }
 
@@ -194,7 +151,7 @@ class PlaygroundProvider extends ChangeNotifier {
     final file = File('${_appDocDir.absolute.path}${_DS}projects$_DS$fileName');
 
     await file.writeAsString(content);
-    await loadProjects();
+
     await loadProject(file);
     return true;
   }
