@@ -415,7 +415,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     final fileToShare = await playgroundProvider.genereSharedActiveProject(
         widget.code, _outputs, _includedFiles);
 
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Please select an output file:',
         fileName: fileName("${fileToShare.path}.zip"),
