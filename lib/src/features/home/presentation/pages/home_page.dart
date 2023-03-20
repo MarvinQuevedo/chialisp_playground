@@ -3,7 +3,7 @@ import 'package:chialisp_playground/src/features/home/presentation/pages/mobile_
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive/responsive.dart';
-import '../../../editor/providers/projects_handler.dart';
+import '../../../editor/providers/projects_handler_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProjectsHandler>(
+    return Consumer<ProjectsHandlerProvider>(
       builder: (context, projectsHandler, child) {
         return FlexBuilderWidget(
           builder: (BuildContext context, double width, double offset,

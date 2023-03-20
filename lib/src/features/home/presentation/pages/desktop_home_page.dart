@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
  
 import '../../../editor/presentation/pages/editor_page.dart';
-import '../../../editor/providers/projects_handler.dart';
+import '../../../editor/providers/projects_handler_provider.dart';
 
 class DesktopHomePage extends StatefulWidget {
   const DesktopHomePage({super.key});
@@ -14,7 +14,7 @@ class DesktopHomePage extends StatefulWidget {
 class _DesktopHomePageState extends State<DesktopHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProjectsHandler>(
+    return Consumer<ProjectsHandlerProvider>(
       builder: (context, projectsHandler, child) {
         return EditorPage( 
           showAppBard: false,
