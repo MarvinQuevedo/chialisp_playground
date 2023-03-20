@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chialisp_playground/src/features/editor/providers/playground_provider.dart';
+import 'package:chialisp_playground/src/features/editor/providers/projects_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,14 +19,14 @@ class _ProjectsPageState extends State<ProjectsPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Provider.of<PlaygroundProvider>(context, listen: false).loadProjects();
+      Provider.of<ProjectsProvider>(context, listen: false).loadProjects();
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PlaygroundProvider>(
+    return Consumer<ProjectsProvider>(
       builder: (context, provider, child) {
         return Scaffold(
             appBar: AppBar(

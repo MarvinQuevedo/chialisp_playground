@@ -22,6 +22,7 @@ class ProjectsProvider extends ChangeNotifier {
 
   Future<void> loadProjects() async {
     _projects = [];
+    notifyListeners();
     final projectsDir = Directory('${_appDocDir!.absolute.path}${_DS}projects');
     if (!projectsDir.existsSync()) {
       projectsDir.createSync(recursive: true);
@@ -38,7 +39,6 @@ class ProjectsProvider extends ChangeNotifier {
         _projects?.add(element);
       }
     });
-
     notifyListeners();
   }
 }
