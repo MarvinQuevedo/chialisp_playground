@@ -40,6 +40,8 @@ class AppTheme {
   static const Color primaryVariant = Color(0xffa6e22e);
   static const Color secondaryLigth = Color(0xffa6e22e);
   static const Color secondaryDark = Color(0xffa6e22e);
+  static const Color leftIconsColorDark = Color(0xff333333);
+  static const Color leftElementsBackColorDark = Color(0xff252525);
 
   static const Color notWhite = Color(0xFFEDF0F2);
   static const Color nearlyWhite = Color(0xFFFEFEFE);
