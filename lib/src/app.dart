@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:provider/provider.dart';
 
+import 'features/editor/providers/projects_handler_provider.dart';
+import 'features/editor/providers/projects_provider.dart';
+import 'features/editor/providers/puzzles_uncompresser_provider.dart';
 import 'features/splash/presentation/splash_page.dart';
 
 class MyApp extends StatelessWidget {
@@ -12,16 +15,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appThemeData = appTheme(context, Brightness.dark);
-
-    return ChangeNotifierProvider(
-      create: (context) => PlaygroundProvider(),
-      child: MaterialApp(
-        title: 'ChiaList Playground',
-        theme: appThemeData.copyWith(
-          scaffoldBackgroundColor: monokaiSublimeTheme['root']!.backgroundColor,
+    
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: ProjectsProvider(),
         ),
-        home: const SplashPage(),
-      ),
+        ChangeNotifierProvider.value(
+          value: ProjectsHandlerProvider(),
+        ),
+        Provider(
+          create: (context) => PuzzleUncompressersProvider(),
+        )
+      ],
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'ChiaList Playground',
+          theme: appThemeData.copyWith(
+            scaffoldBackgroundColor:
+                monokaiSublimeTheme['root']!.backgroundColor,
+          ),
+          home: const SplashPage(),
+        );
+      },
     );
   }
 }
