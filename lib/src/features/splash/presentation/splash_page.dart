@@ -1,14 +1,11 @@
-import 'dart:io';
-import 'dart:typed_data';
+// ignore_for_file: use_build_context_synchronously
 
-import 'package:archive/archive_io.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../editor/providers/playground_provider.dart';
+import '../../editor/providers/projects_provider.dart';
+import '../../editor/providers/puzzles_uncompresser_provider.dart';
 import '../../home/presentation/pages/home_page.dart';
 
 class SplashPage extends StatefulWidget {
@@ -52,22 +49,24 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
   }
 
-  void _initEnviroments() async {
+  void _initEnviroments() {
     final playgroundProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    await playgroundProvider.init(rootBundle);
-    _goToHomePage();
-  }
-
-  void _log(String message) {
-    setState(() {
-      log = message;
+        Provider.of<PuzzleUncompressersProvider>(context, listen: false);
+    playgroundProvider.init(rootBundle).then((value) {
+      final projecsProvider =
+          Provider.of<ProjectsProvider>(context, listen: false);
+      projecsProvider.appDocDir = playgroundProvider.appDocDir;
+      projecsProvider.loadProjects().then((value) {
+        _goToHomePage();
+      });
     });
   }
 
   void _goToHomePage() {
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-      builder: (context) => const HomePage(),
-    ), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+        (route) => false);
   }
 }
