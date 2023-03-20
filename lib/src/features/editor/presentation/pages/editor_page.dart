@@ -123,38 +123,38 @@ class EditorPageState extends State<EditorPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: "\t",
                                   maxWidth: 45,
                                   child: const Text("TAB"),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: "(",
                                   child: const Text("("),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: ")",
                                   child: const Text(")"),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: ";",
                                   child: const Text(";"),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: ".",
                                   child: const Text("."),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: "'",
                                   child: const Text("'"),
                                 ),
                                 _ActionButton(
-                                  onPressed: _addChar,
+                                  onPressed: addChar,
                                   value: "\"",
                                   child: const Text("\""),
                                 ),
@@ -239,7 +239,7 @@ class EditorPageState extends State<EditorPage> {
     _controller.historyController.undo();
   }
 
-  void _addChar(value) {
+  void addChar(value) {
     _controller.insertStr(value);
   }
 
