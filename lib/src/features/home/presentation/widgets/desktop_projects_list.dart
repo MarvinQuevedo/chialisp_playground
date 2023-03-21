@@ -1,5 +1,5 @@
 import 'dart:io';
- 
+
 import '../../../editor/providers/projects_handler_provider.dart';
 import '../../../editor/utils/save_file_dialog.dart';
 import 'hovered_icon_button.dart';
@@ -54,17 +54,23 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
                       height: 35,
                       child: Center(
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              "Projects",
-                              style: TextStyle(
-                                fontSize: 16,
+                            const Expanded(
+                              child: Text(
+                                "Projects",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                             HoveredIconButton(
-                                icon: Ionicons.add,
-                                onPressed: () => _createNewFile(context))
+                              icon: Ionicons.reload,
+                              onPressed: _reload,
+                            ),
+                            HoveredIconButton(
+                              icon: Ionicons.add,
+                              onPressed: () => _createNewFile(context),
+                            ),
                           ],
                         ),
                       ),
@@ -98,17 +104,21 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
         .openProject(file, false);
   }
 
-  void _loadProjectsList() {
-    Provider.of<ProjectsProvider>(context, listen: false).loadProjects();
+  void _loadProjectsList({bool forceLoading = false}) {
+    Provider.of<ProjectsProvider>(context, listen: false).loadProjects(forceLoading: forceLoading);
   }
 
   _createNewFile(BuildContext context) {
-     showSaveFileDialog(context, "", title: "Create new file").then((result) {
+    showSaveFileDialog(context, "", title: "Create new file").then((result) {
       if (result != null) {
         final proHandler =
             Provider.of<ProjectsHandlerProvider>(context, listen: false);
         proHandler.openProjectWithName(result, false);
       }
     });
+  }
+
+  _reload() {
+    _loadProjectsList(forceLoading: true);
   }
 }

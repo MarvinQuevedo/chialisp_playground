@@ -20,9 +20,15 @@ class ProjectsProvider extends ChangeNotifier {
     loadProjects();
   }
 
-  Future<void> loadProjects() async {
-    _projects = [];
-    notifyListeners();
+  Future<void> loadProjects({bool forceLoading = false}) async {
+    _projects = forceLoading ? null : [];
+    if (forceLoading) {
+      notifyListeners();
+      // Only for refresh the UI and the user can see the loading
+      await Future.delayed(const Duration(milliseconds: 150));
+      _projects = [];
+    }
+
     final projectsDir = Directory('${_appDocDir!.absolute.path}${_DS}projects');
     if (!projectsDir.existsSync()) {
       projectsDir.createSync(recursive: true);
