@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:chialisp_playground/src/features/editor/providers/projects_handler_provider.dart';
+
 import '../../../editor/providers/projects_provider.dart';
 import 'project_item.dart';
 import 'package:flutter/material.dart';
@@ -43,11 +45,16 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
               return ListView(
                 children: [
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                    child: Text(
-                      "Projects",
-                      style: TextStyle(
-                        fontSize: 16,
+                    padding: EdgeInsets.symmetric(horizontal: 10 ),
+                    child: SizedBox(
+                      height: 35,
+                      child: Center(
+                        child: Text(
+                          "Projects",
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -74,7 +81,9 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
         ));
   }
 
-  _openProject(BuildContext context, File file) {}
+  _openProject(BuildContext context, File file) {
+    Provider.of<ProjectsHandlerProvider>(context, listen: false).openProject(file, false);
+  }
 
   void _loadProjectsList() {
     Provider.of<ProjectsProvider>(context, listen: false).loadProjects();
