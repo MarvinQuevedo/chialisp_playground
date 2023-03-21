@@ -6,6 +6,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/playground_provider.dart';
+import '../../providers/projects_handler_provider.dart';
 import '../../providers/projects_provider.dart';
 import '../../providers/puzzles_uncompresser_provider.dart';
 import '../../utils/chialisp.dart';
@@ -200,16 +201,19 @@ class EditorPageState extends State<EditorPage> {
         fileName(activeProject.path),
         _controller.text,
       );
-      // ignore: use_build_context_synchronously
+       
       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultControlsPage(
-            code: _controller.text,
-            theme: theme,
-          ),
-        ),
-      );
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider.value(
+                value: playProvider,
+                child: Builder(
+                  builder: (context) => ResultControlsPage(
+                    code: _controller.text,
+                    theme: theme,
+                  ),
+                )),
+          ));
     }
   }
 
@@ -261,6 +265,10 @@ class EditorPageState extends State<EditorPage> {
       context,
       listen: false,
     );
+    final proHandler = Provider.of<ProjectsHandlerProvider>(
+      context,
+      listen: false,
+    );
     projectsProvider.addListener(_updateProjectsNames);
     _playProvider
         .init(
@@ -268,6 +276,7 @@ class EditorPageState extends State<EditorPage> {
       appDocDir: puzzlesProvider.appDocDir,
       projectsFilesNames: puzzlesProvider.puzzlesFilesNames,
       puzzlesFilesNames: projectsProvider.projectsFilesNames,
+      file: proHandler.currentProject?.file,
     )
         .then((value) {
       _controller.autocompleter.setCustomWords(_playProvider.includeFilesNames);
