@@ -14,10 +14,11 @@ class DesktopHomePage extends StatefulWidget {
 }
 
 class _DesktopHomePageState extends State<DesktopHomePage> {
-  late final GlobalKey<EditorPageState> _editorPageKey;
+ 
+  late final GlobalKey desktopEditorKey;
   @override
   void initState() {
-    _editorPageKey = GlobalKey();
+    desktopEditorKey = GlobalKey(); 
     super.initState();
   }
 
@@ -27,7 +28,7 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
       body: Consumer<ProjectsHandlerProvider>(
         builder: (context, projectsHandler, child) {
           final key = Key("${projectsHandler.currentProject?.id}");
-         
+
           return Row(
             children: [
               const DesktopDrawer(),
@@ -35,22 +36,25 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
                 child: SizedBox(
                   key: key,
                   child: Column(
-                    children:   [
-                      const DesktopEditorHeader(),
-                      if(projectsHandler.currentProject != null)
-                       const Expanded(
-                        child: EditorPage(
-                          showAppBard: false,
-                          showBottomMenu: false,
-                          // key: _editorPageKey,
-                        ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DesktopEditorHeader(
+                        key: desktopEditorKey,
                       ),
-                      if(projectsHandler.currentProject == null)
-                      const Expanded(
-                        child: Center(
-                          child: Text("No project opened"),
+                      if (projectsHandler.currentProject != null)
+                        const Expanded(
+                          child: EditorPage(
+                            showAppBard: false,
+                            showBottomMenu: false,
+                            // key: _editorPageKey,
+                          ),
                         ),
-                      ),
+                      if (projectsHandler.currentProject == null)
+                        const Expanded(
+                          child: Center(
+                            child: Text("No project opened"),
+                          ),
+                        ),
                     ],
                   ),
                 ),
