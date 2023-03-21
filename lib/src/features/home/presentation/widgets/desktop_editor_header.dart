@@ -27,8 +27,7 @@ class DesktopEditorHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: ThemeProvider.of(context).leftIconsColorDark,
       ),
-      child: Scrollbar(
-        thumbVisibility: true,
+      child: Scrollbar( 
         child: SingleChildScrollView(
           primary: true,
           physics: const BouncingScrollPhysics(),

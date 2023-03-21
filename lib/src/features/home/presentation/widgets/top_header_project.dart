@@ -57,6 +57,7 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
             Text(
               widget.project.fileName,
               style: TextStyle(
+                fontSize: ThemeProvider.of(context). topProjectsListFontSize,
                 color: !widget.isActive
                     ? Colors.white.withOpacity(0.8)
                     : Colors.white,
