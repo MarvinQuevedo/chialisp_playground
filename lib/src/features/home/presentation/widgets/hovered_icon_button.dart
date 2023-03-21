@@ -17,7 +17,7 @@ class HoveredIconButton extends StatefulWidget {
       required this.onPressed,
       this.enabled = true,
       this.color = Colors.white,
-      this.size = 24,
+      this.size = 20,
       this.hoverColor});
 
   @override
@@ -32,18 +32,21 @@ class _HoveredIconButtonState extends State<HoveredIconButton> {
       cursor: SystemMouseCursors.click,
       onEnter: _onEnter,
       onExit: _onExit,
-      child: GestureDetector(
-          onTap: widget.enabled ? widget.onPressed : null,
-          child: IconButton(
-            iconSize:widget.size,
-            icon: Icon(
-              widget.icon,
-              color: _hovering
-                  ? (ThemeProvider.of(context).hoverColor)
-                  : widget.color,
-            ),
-            onPressed: widget.enabled ? widget.onPressed : null,
-          )),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+            onTap: widget.enabled ? widget.onPressed : null,
+            child: IconButton(
+              iconSize:widget.size,
+              icon: Icon(
+                widget.icon,
+                color: _hovering
+                    ? (ThemeProvider.of(context).hoverColor)
+                    : widget.color,
+              ),
+              onPressed: widget.enabled ? widget.onPressed : null,
+            )),
+      ),
     );
   }
 

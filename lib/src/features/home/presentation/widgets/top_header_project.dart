@@ -30,8 +30,6 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      
-      
       child: InkWell(
         onTap: () {
           widget.onTap(widget.project);
@@ -43,18 +41,25 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: !widget.isActive ? (_hovered?Colors.black.withOpacity(0.2):Colors.white.withOpacity(0.05)) : Colors.black38,
-            borderRadius: BorderRadius.circular(0),
+            color: !widget.isActive
+                ? (_hovered
+                    ? Colors.black.withOpacity(0.2)
+                    : Colors.green.withOpacity(0.06))
+                : Colors.black38,
+            border:
+                Border(right: BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          height: 35,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          height: 40,
           child: Row(children: [
             icon(context),
             const SizedBox(width: 5),
             Text(
               widget.project.fileName,
               style: TextStyle(
-                color: !widget.isActive ? Colors.white.withOpacity(0.8) : Colors.white,
+                color: !widget.isActive
+                    ? Colors.white.withOpacity(0.8)
+                    : Colors.white,
               ),
             ),
             HoveredIconButton(
@@ -64,7 +69,6 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
               size: 15,
               icon: Icons.close,
               hoverColor: ThemeProvider.of(context).hoverColor,
-              
             ),
           ]),
         ),

@@ -21,28 +21,23 @@ class DesktopEditorHeader extends StatelessWidget {
             modified: false))
         .toList();
 
-    final size = MediaQuery.of(context).size;
-    final width = size.width;
-    if (projectsItems.length * 100 < width - 10) {
-      final count = (width - 10) / 100;
-      for (var i = 0; i < count; i++) {
-        projectsItems.add(Container(
-          width: 100,
-          color: Colors.transparent,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-        ));
-      }
-    }
+   
     return Container(
-      height: 35,
+      height: 42,
       decoration: BoxDecoration(
         color: ThemeProvider.of(context).leftIconsColorDark,
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: projectsItems),
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          primary: true,
+          physics: const BouncingScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: projectsItems),
+        ),
       ),
     );
   }
