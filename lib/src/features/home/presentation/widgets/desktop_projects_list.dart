@@ -1,6 +1,9 @@
 import 'dart:io';
-
-import 'package:chialisp_playground/src/features/editor/providers/projects_handler_provider.dart';
+ 
+import '../../../editor/providers/projects_handler_provider.dart';
+import '../../../editor/utils/save_file_dialog.dart';
+import 'hovered_icon_button.dart';
+import 'package:ionicons/ionicons.dart';
 
 import '../../../editor/providers/projects_provider.dart';
 import 'project_item.dart';
@@ -44,16 +47,25 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
               }
               return ListView(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10 ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                     child: SizedBox(
                       height: 35,
                       child: Center(
-                        child: Text(
-                          "Projects",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Projects",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            HoveredIconButton(
+                                icon: Ionicons.add,
+                                onPressed: () => _createNewFile(context))
+                          ],
                         ),
                       ),
                     ),
@@ -82,10 +94,21 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
   }
 
   _openProject(BuildContext context, File file) {
-    Provider.of<ProjectsHandlerProvider>(context, listen: false).openProject(file, false);
+    Provider.of<ProjectsHandlerProvider>(context, listen: false)
+        .openProject(file, false);
   }
 
   void _loadProjectsList() {
     Provider.of<ProjectsProvider>(context, listen: false).loadProjects();
+  }
+
+  _createNewFile(BuildContext context) {
+     showSaveFileDialog(context, "", title: "Create new file").then((result) {
+      if (result != null) {
+        final proHandler =
+            Provider.of<ProjectsHandlerProvider>(context, listen: false);
+        proHandler.openProjectWithName(result, false);
+      }
+    });
   }
 }
