@@ -79,7 +79,12 @@ class PlaygroundProvider extends ChangeNotifier {
       await playgroundDir.delete(recursive: true);
     }
     playgroundDir.createSync(recursive: true);
-    loadProject(file);
+
+    _includeFilesNames.addAll(puzzlesFilesNames);
+    _includeFilesNames.addAll(projectsFilesNames);
+    _includeFilesNames = _includeFilesNames.toSet().toList();
+    
+    await loadProject(file);
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
@@ -113,6 +118,7 @@ class PlaygroundProvider extends ChangeNotifier {
       }
       playgroundFile.writeAsBytesSync(projectFile.readAsBytesSync());
     }
+
     return true;
   }
 
