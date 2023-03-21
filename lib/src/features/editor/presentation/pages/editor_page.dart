@@ -11,7 +11,7 @@ import '../../providers/projects_provider.dart';
 import '../../providers/puzzles_uncompresser_provider.dart';
 import '../../utils/chialisp.dart';
 import '../../utils/dir_splitter.dart';
-import '../../utils/monokaiSublimeThemeWithFont.dart';
+import '../../utils/monokai_sublime_theme_with_font.dart';
 import '../../utils/save_file_dialog.dart';
 import '../../utils/snackbar.dart';
 import '../widgets/editor_drawer.dart';
