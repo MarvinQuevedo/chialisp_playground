@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../editor/presentation/pages/editor_page.dart';
 import '../../../editor/providers/projects_handler_provider.dart';
 import '../widgets/desktop_drawer.dart';
+import '../widgets/desktop_editor_header.dart';
 
 class DesktopHomePage extends StatefulWidget {
   const DesktopHomePage({super.key});
@@ -25,18 +26,33 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
     return Scaffold(
       body: Consumer<ProjectsHandlerProvider>(
         builder: (context, projectsHandler, child) {
+          final key = Key("${projectsHandler.currentProject?.id}");
+         
           return Row(
             children: [
               const DesktopDrawer(),
               Expanded(
                 child: SizedBox(
-                  key: Key(
-                    "${projectsHandler.currentProject?.id}",
+                  key: key,
+                  child: Column(
+                    children:   [
+                      const DesktopEditorHeader(),
+                      if(projectsHandler.currentProject != null)
+                       const Expanded(
+                        child: EditorPage(
+                          showAppBard: false,
+                          showBottomMenu: false,
+                          // key: _editorPageKey,
+                        ),
+                      ),
+                      if(projectsHandler.currentProject == null)
+                      const Expanded(
+                        child: Center(
+                          child: Text("No project opened"),
+                        ),
+                      ),
+                    ],
                   ),
-                  child: EditorPage(
-                      showAppBard: false,
-                      showBottomMenu: false,
-                      key: _editorPageKey),
                 ),
               )
             ],
