@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:chialisp_playground/src/features/editor/providers/projects_handler_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -52,12 +53,19 @@ class _SplashPageState extends State<SplashPage> {
   void _initEnviroments() {
     final playgroundProvider =
         Provider.of<PuzzleUncompressersProvider>(context, listen: false);
+    final projectsHandler =
+        Provider.of<ProjectsHandlerProvider>(context, listen: false);
     playgroundProvider.init(rootBundle).then((value) {
       final projecsProvider =
           Provider.of<ProjectsProvider>(context, listen: false);
       projecsProvider.appDocDir = playgroundProvider.appDocDir;
       projecsProvider.loadProjects().then((value) {
-        _goToHomePage();
+        projectsHandler
+            .init(
+                rootBundle: rootBundle, appDocDir: playgroundProvider.appDocDir)
+            .then((value) {
+          _goToHomePage();
+        });
       });
     });
   }
