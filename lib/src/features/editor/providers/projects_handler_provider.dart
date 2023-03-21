@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, constant_identifier_names, non_constant_identifier_names
 
 import 'dart:io';
 
@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/dir_splitter.dart' as dirSplitter;
 
 const _LAST_PROJECT = "last_project";
+final _DS = dirSplitter.dirSplitter;
 
 class ProjectData extends Equatable {
   final File file;
@@ -53,6 +54,11 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     }
   }
 
+  void openProjectWithName(String fileName, bool readOnly) {
+    final file = File('${_appDocDir.absolute.path}${_DS}projects$_DS$fileName');
+    return openProject(file, readOnly);
+  }
+
   String _calculateId(File file) {
     return file.path;
   }
@@ -82,5 +88,12 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   void closeAllProjects() {
     _projects = {};
     notifyListeners();
+  }
+
+  Future<bool> saveProject(String fileName, String content) async {
+    final file = File('${_appDocDir.absolute.path}${_DS}projects$_DS$fileName');
+    await file.writeAsString(content);
+
+    return true;
   }
 }
