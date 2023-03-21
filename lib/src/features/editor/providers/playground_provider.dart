@@ -1,17 +1,13 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:io';
-import 'dart:developer' as developer;
 
 import 'package:archive/archive_io.dart';
 import 'package:chialisp_playground/src/features/editor/utils/default_clsp_project.dart';
 import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-const _LAST_PROJECT = "last_project";
 final _DS = dirSplitter;
 
 class PlaygroundProvider extends ChangeNotifier {
@@ -52,8 +48,6 @@ class PlaygroundProvider extends ChangeNotifier {
   ];
   List<String> get includeFilesNames => _includeFilesNames;
 
-  late final SharedPreferences _sharedPreferencfes;
-
   String get playgroundInclude => playgroundDir.absolute.path;
 
   String? get activeProjectName {
@@ -70,11 +64,13 @@ class PlaygroundProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> init(
-      {required AssetBundle rootBundle,
-      required List<String> puzzlesFilesNames,
-      required List<String> projectsFilesNames,
-      required Directory appDocDir}) async {
+  Future<void> init({
+    required AssetBundle rootBundle,
+    required List<String> puzzlesFilesNames,
+    required List<String> projectsFilesNames,
+    required Directory appDocDir,
+    required File? file,
+  }) async {
     _appDocDir = appDocDir;
 
     playgroundDir = Directory('${_appDocDir.path}${_DS}playground');
@@ -82,9 +78,7 @@ class PlaygroundProvider extends ChangeNotifier {
       await playgroundDir.delete(recursive: true);
     }
     playgroundDir.createSync(recursive: true);
-
-    _sharedPreferencfes = await SharedPreferences.getInstance();
-    await readLastProject();
+    loadProject(file);
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
@@ -121,23 +115,17 @@ class PlaygroundProvider extends ChangeNotifier {
     return true;
   }
 
-  Future<void> readLastProject() async {
-    final lastProject = _sharedPreferencfes.getString(_LAST_PROJECT);
-    if (lastProject != null) {
-      final file = File(lastProject);
-      if (file.existsSync()) {
-        await loadProject(file);
-      }
-    } else {
+  Future<String> loadProject(File? file) async {
+    if (file == null) {
+      _activeProject = null;
+      _activeProjectCode = null;
       _controller.text = defaultClspProject;
+      return defaultClspProject;
     }
-  }
-
-  Future<String> loadProject(File file) async {
     final fileData = await file.readAsString();
     _activeProject = file;
     _activeProjectCode = fileData;
-    _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
+
     _controller.text = fileData;
     return fileData;
   }
