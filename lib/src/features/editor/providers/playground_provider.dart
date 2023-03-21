@@ -8,6 +8,7 @@ import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
+// ignore: non_constant_identifier_names
 final _DS = dirSplitter;
 
 class PlaygroundProvider extends ChangeNotifier {
