@@ -21,12 +21,13 @@ class DesktopEditorHeader extends StatelessWidget {
             modified: false))
         .toList();
 
-   
+    final size = MediaQuery.of(context).size;
     return Container(
       height: 42,
       decoration: BoxDecoration(
         color: ThemeProvider.of(context).leftIconsColorDark,
       ),
+      width: size.width ,
       child: Scrollbar( 
         child: SingleChildScrollView(
           primary: true,
