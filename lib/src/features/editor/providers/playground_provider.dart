@@ -1,12 +1,14 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:io';
-
+import 'dart:developer' as developer;
 import 'package:archive/archive_io.dart';
 import 'package:chialisp_playground/src/features/editor/utils/default_clsp_project.dart';
 import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+
+import '../data/temp_repository.dart';
 
 // ignore: non_constant_identifier_names
 final _DS = dirSplitter;
@@ -18,8 +20,14 @@ class PlaygroundProvider extends ChangeNotifier {
 
   PlaygroundProvider(this._controller);
 
+ 
+
   File? _activeProject;
   File? get activeProject => _activeProject;
+
+  final _saved = ValueNotifier(false);
+  bool get saved => _saved.value;
+  ValueNotifier get savedNotifier => _saved;
 
   String? _activeProjectCode;
   String? get activeProjectCode => _activeProjectCode;
@@ -83,7 +91,7 @@ class PlaygroundProvider extends ChangeNotifier {
     _includeFilesNames.addAll(puzzlesFilesNames);
     _includeFilesNames.addAll(projectsFilesNames);
     _includeFilesNames = _includeFilesNames.toSet().toList();
-    
+
     await loadProject(file);
   }
 
@@ -129,11 +137,22 @@ class PlaygroundProvider extends ChangeNotifier {
       _controller.text = defaultClspProject;
       return defaultClspProject;
     }
-    final fileData = await file.readAsString();
     _activeProject = file;
+    final tempData = TempRepository.instance.get(activeProjectName ?? "...");
+    if (tempData != null) {
+      _controller.text = tempData;
+      _activeProjectCode = tempData;
+      developer.log("loadProject: $tempData", name: "PlaygroundProvider");
+      _saved.value = false;
+      return tempData;
+    }
+
+    final fileData = await file.readAsString();
+
     _activeProjectCode = fileData;
 
     _controller.text = fileData;
+    _saved.value = true;
     return fileData;
   }
 
@@ -148,6 +167,8 @@ class PlaygroundProvider extends ChangeNotifier {
     await file.writeAsString(content);
 
     await loadProject(file);
+    _saved.value = false;
+    TempRepository.instance.remove(activeProjectName ?? "...");
     return true;
   }
 
@@ -183,5 +204,13 @@ class PlaygroundProvider extends ChangeNotifier {
     await output.delete();
 
     return zipFile;
+  }
+
+  Directory get tempDir {
+    final tempFolder = Directory('${_appDocDir.absolute.path}${_DS}temp');
+    if (!tempFolder.existsSync()) {
+      tempFolder.createSync(recursive: true);
+    }
+    return tempFolder;
   }
 }
