@@ -5,6 +5,7 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/editor_actions_provider.dart';
 import '../../providers/playground_provider.dart';
 import '../../providers/projects_handler_provider.dart';
 import '../../providers/projects_provider.dart';
@@ -31,7 +32,7 @@ class EditorPage extends StatefulWidget {
   State<EditorPage> createState() => EditorPageState();
 }
 
-class EditorPageState extends State<EditorPage> {
+class EditorPageState extends State<EditorPage> with EditorActionHelper {
   String? lastCode;
   late final CodeController _controller;
   Map<String, TextStyle> theme = monokaiSublimeTheme;
@@ -189,7 +190,8 @@ class EditorPageState extends State<EditorPage> {
     super.initState();
   }
 
-  openRunPage(BuildContext context) async {
+  @override
+  void openRunPage(BuildContext context) async {
     final playProvider =
         Provider.of<PlaygroundProvider>(context, listen: false);
     final activeProject = playProvider.activeProject;
@@ -201,7 +203,7 @@ class EditorPageState extends State<EditorPage> {
         fileName(activeProject.path),
         _controller.text,
       );
-       
+
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -217,10 +219,12 @@ class EditorPageState extends State<EditorPage> {
     }
   }
 
-  redoCode(BuildContext context) {
+  @override
+  void redoCode(BuildContext context) {
     _controller.historyController.redo();
   }
 
+  @override
   Future<String?> saveFile(BuildContext context,
       {String title = 'Save file'}) async {
     final playProvider =
@@ -239,11 +243,13 @@ class EditorPageState extends State<EditorPage> {
     }
   }
 
-  undoCode(BuildContext context) {
+  @override
+  void undoCode(BuildContext context) {
     _controller.historyController.undo();
   }
 
-  void addChar(value) {
+  @override
+  void addChar(String value) {
     _controller.insertStr(value);
   }
 
@@ -272,17 +278,27 @@ class EditorPageState extends State<EditorPage> {
     projectsProvider.addListener(_updateProjectsNames);
     _playProvider
         .init(
-      rootBundle: rootBundle,
-      appDocDir: puzzlesProvider.appDocDir,
-      projectsFilesNames: puzzlesProvider.puzzlesFilesNames,
-      puzzlesFilesNames: projectsProvider.projectsFilesNames,
-      file: proHandler.currentProject?.file,
-    )
+            rootBundle: rootBundle,
+            appDocDir: puzzlesProvider.appDocDir,
+            projectsFilesNames: puzzlesProvider.puzzlesFilesNames,
+            puzzlesFilesNames: projectsProvider.projectsFilesNames,
+            file: proHandler.currentProject?.file)
         .then((value) {
       _controller.autocompleter.setCustomWords(_playProvider.includeFilesNames);
       _editorFocusNode.addListener(_forceInitializedEditor);
       FocusScope.of(context).requestFocus(_editorFocusNode);
     });
+
+    _playProvider.savedNotifier.addListener(_onTextChanged);
+    _controller.addListener(_onTextChanged);
+    EditorActionsProvider.of(context, listen: false).editorActionHelper = this;
+  }
+
+  @override
+  void dispose() {
+    _playProvider.savedNotifier.removeListener(_onTextChanged);
+    _controller.removeListener(_onTextChanged);
+    super.dispose();
   }
 
   void _updateProjectsNames() {
@@ -292,17 +308,33 @@ class EditorPageState extends State<EditorPage> {
     );
     _playProvider.updateProjectsFilesNames(projectsProvider.projectsFilesNames);
   }
+
+  void _onTextChanged() {
+    final proHandler = Provider.of<ProjectsHandlerProvider>(
+      context,
+      listen: false,
+    );
+    final saved = _playProvider.savedNotifier.value;
+
+    final activeProject = proHandler.currentProject;
+    if (activeProject != null) {
+      proHandler.onChangeText(
+          projectData: activeProject, value: _controller.text);
+      proHandler.updateValue(activeProject.copyWith(
+        saved: saved,
+      ));
+    }
+  }
 }
 
 class _ActionButton extends StatelessWidget {
   final Widget child;
-  final ValueChanged onPressed;
+  final ValueChanged<String> onPressed;
   final String value;
   final double maxWidth;
 
   const _ActionButton(
-      {super.key,
-      required this.child,
+      {required this.child,
       required this.onPressed,
       required this.value,
       this.maxWidth = 40});
