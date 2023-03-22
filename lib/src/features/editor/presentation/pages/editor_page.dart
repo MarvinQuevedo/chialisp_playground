@@ -55,22 +55,22 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
               elevation: 0,
               actions: [
                 IconButton(
-                  onPressed: () => undoCode(context),
+                  onPressed: () => undoCode(),
                   icon: const Icon(Ionicons.arrow_undo),
                   iconSize: 30,
                 ),
                 IconButton(
-                  onPressed: () => redoCode(context),
+                  onPressed: () => redoCode(),
                   icon: const Icon(Ionicons.arrow_redo),
                   iconSize: 30,
                 ),
                 IconButton(
-                  onPressed: () => saveFile(context),
+                  onPressed: () => saveFile(),
                   icon: const Icon(Ionicons.save),
                   iconSize: 35,
                 ),
                 IconButton(
-                  onPressed: () => openRunPage(context),
+                  onPressed: () => openRunPage(),
                   icon: const Icon(Ionicons.play_circle_outline),
                   iconSize: 40,
                 ),
@@ -191,15 +191,13 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   @override
-  void openRunPage(BuildContext context) async {
-    final playProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    final activeProject = playProvider.activeProject;
+  void openRunPage() async {
+    final activeProject = _playProvider.activeProject;
 
     if (activeProject == null) {
-      await saveFile(context, title: "Save file first");
+      await saveFile(title: "Save file first");
     } else {
-      playProvider.saveProject(
+      _playProvider.saveProject(
         fileName(activeProject.path),
         _controller.text,
       );
@@ -208,7 +206,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
           context,
           MaterialPageRoute(
             builder: (context) => ChangeNotifierProvider.value(
-                value: playProvider,
+                value: _playProvider,
                 child: Builder(
                   builder: (context) => ResultControlsPage(
                     code: _controller.text,
@@ -220,20 +218,17 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   @override
-  void redoCode(BuildContext context) {
+  void redoCode() {
     _controller.historyController.redo();
   }
 
   @override
-  Future<String?> saveFile(BuildContext context,
-      {String title = 'Save file'}) async {
-    final playProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    final activeProject = playProvider.activeProject;
+  Future<String?> saveFile({String title = 'Save file'}) async {
+    final activeProject = _playProvider.activeProject;
     if (activeProject == null) {
       return showSaveFileDialog(context, _controller.text, title: title);
     } else {
-      await playProvider.saveProject(
+      await _playProvider.saveProject(
           fileName(activeProject.path), _controller.text);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
@@ -244,7 +239,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   @override
-  void undoCode(BuildContext context) {
+  void undoCode() {
     _controller.historyController.undo();
   }
 
