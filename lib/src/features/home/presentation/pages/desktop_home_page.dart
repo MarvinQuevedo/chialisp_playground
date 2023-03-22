@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../editor/presentation/pages/editor_page.dart';
+import '../../../editor/presentation/pages/editor_page.dart'; 
 import '../../../editor/providers/projects_handler_provider.dart';
+import '../widgets/desktop_actions.dart';
 import '../widgets/desktop_drawer.dart';
 import '../widgets/desktop_editor_header.dart';
 
@@ -14,11 +15,10 @@ class DesktopHomePage extends StatefulWidget {
 }
 
 class _DesktopHomePageState extends State<DesktopHomePage> {
- 
   late final GlobalKey desktopEditorKey;
   @override
   void initState() {
-    desktopEditorKey = GlobalKey(); 
+    desktopEditorKey = GlobalKey();
     super.initState();
   }
 
@@ -38,8 +38,16 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      DesktopEditorHeader(
-                        key: desktopEditorKey,
+                      Stack(
+                        children: [
+                          DesktopEditorHeader(
+                            key: desktopEditorKey,
+                          ),
+                          const Align(
+                            alignment: Alignment.topRight,
+                            child: DesktopActionsWidget(),
+                          ),
+                        ],
                       ),
                       if (projectsHandler.currentProject != null)
                         const Expanded(
