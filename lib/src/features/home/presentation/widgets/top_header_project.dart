@@ -28,6 +28,17 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
   bool _hovered = false;
   @override
   Widget build(BuildContext context) {
+    Color backColor = !widget.isActive
+        ? (_hovered
+            ? Colors.black.withOpacity(0.2)
+            : Colors.green.withOpacity(0.06))
+        : Colors.black38;
+    Color foregroundColor =
+        !widget.isActive ? Colors.white.withOpacity(0.8) : Colors.white;
+    final isSaved = ProjectsHandlerProvider.of(context).isSaved(widget.project);
+    if (!isSaved) {
+      foregroundColor = Colors.orange;
+    }
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: InkWell(
@@ -41,13 +52,10 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: !widget.isActive
-                ? (_hovered
-                    ? Colors.black.withOpacity(0.2)
-                    : Colors.green.withOpacity(0.06))
-                : Colors.black38,
-            border:
-                Border(right: BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
+            color: backColor,
+            border: Border(
+                right:
+                    BorderSide(color: Colors.black.withOpacity(0.2), width: 1)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           height: 40,
@@ -57,10 +65,8 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
             Text(
               widget.project.fileName,
               style: TextStyle(
-                fontSize: ThemeProvider.of(context). topProjectsListFontSize,
-                color: !widget.isActive
-                    ? Colors.white.withOpacity(0.8)
-                    : Colors.white,
+                fontSize: ThemeProvider.of(context).topProjectsListFontSize,
+                color: foregroundColor,
               ),
             ),
             HoveredIconButton(
@@ -69,6 +75,7 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
               },
               size: 15,
               icon: Icons.close,
+              color: foregroundColor,
               hoverColor: ThemeProvider.of(context).hoverColor,
             ),
           ]),
