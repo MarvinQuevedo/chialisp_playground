@@ -1,10 +1,13 @@
 // ignore_for_file: must_be_immutable, constant_identifier_names, non_constant_identifier_names
 
 import 'dart:io';
-
+import 'dart:developer' as developer;
 import 'package:flutter/cupertino.dart';
 import 'package:equatable/equatable.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// ignore: library_prefixes
+import '../data/temp_repository.dart';
 // ignore: library_prefixes
 import '../utils/dir_splitter.dart' as dirSplitter;
 
@@ -15,21 +18,25 @@ class ProjectData extends Equatable {
   final File file;
   final bool readOnly;
   final String id;
-  String unSavedData;
+  final bool saved;
 
-  ProjectData(this.file, this.readOnly, this.id, {this.unSavedData = ''});
+  const ProjectData(this.file, this.readOnly, this.id, {this.saved = false});
 
   @override
   List<Object?> get props => [file.path, id];
 
   String get fileName => dirSplitter.fileName(file.path);
+
+  ProjectData copyWith({bool? saved}) {
+    return ProjectData(file, readOnly, id, saved: saved ?? this.saved);
+  }
 }
 
 class ProjectsHandlerProvider extends ChangeNotifier {
   late final SharedPreferences _sharedPreferencfes;
   late final Directory _appDocDir;
-  Set<ProjectData> _projects = {};
-  Set<ProjectData> get projects => _projects;
+  Map<int, ProjectData> _projects = {};
+  Set<ProjectData> get projects => _projects.values.toSet();
   ProjectData? _currentProject;
   ProjectData? get currentProject => _currentProject;
 
@@ -39,12 +46,13 @@ class ProjectsHandlerProvider extends ChangeNotifier {
 
     _sharedPreferencfes = await SharedPreferences.getInstance();
     await readLastProject();
+    await TempRepository.instance.loadTempFile();
   }
 
   void openProject(File file, bool readOnly) {
     final projectData = ProjectData(file, readOnly, _calculateId(file));
-    if (!_projects.contains(projectData)) {
-      _projects.add(projectData);
+    if (!projects.contains(projectData)) {
+      _projects[projects.length] = projectData;
       _currentProject = projectData;
       _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
       notifyListeners();
@@ -73,11 +81,21 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     }
   }
 
+  int? getProjectIndex(ProjectData projectData) {
+    for (final key in _projects.keys) {
+      if (_projects[key] == projectData) {
+        return key;
+      }
+    }
+    return null;
+  }
+
   void closeProject(ProjectData projectData) {
-    _projects.remove(projectData);
+    final proIndex = getProjectIndex(projectData);
+    _projects.remove(proIndex);
     if (_currentProject == projectData) {
       if (_projects.isNotEmpty) {
-        _currentProject = _projects.first;
+        _currentProject = _projects.values.last;
       } else {
         _currentProject = null;
       }
@@ -95,5 +113,34 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     await file.writeAsString(content);
 
     return true;
+  }
+
+  void onChangeText(
+      {required ProjectData projectData, required String value}) async {
+    final stopWatch = Stopwatch()..start();
+    TempRepository.instance.set(projectData.id, value);
+    updateValue(projectData.copyWith(saved: true));
+    stopWatch.stop();
+    developer.log("onChangeText: ${stopWatch.elapsedMilliseconds}");
+  }
+
+  void updateValue(ProjectData value) {
+    final proIndex = getProjectIndex(value);
+    if (proIndex != null) {
+      _projects[proIndex] = value;
+    }
+  }
+
+  static ProjectsHandlerProvider of(BuildContext context,
+      {bool listen = false}) {
+    return Provider.of<ProjectsHandlerProvider>(context, listen: listen);
+  }
+
+  bool isSaved(ProjectData project) {
+    final proIndex = getProjectIndex(project);
+    if (proIndex != null) {
+      TempRepository.instance.get(project.id);
+    }
+    return false;
   }
 }
