@@ -1,6 +1,5 @@
- 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart'; 
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../home/presentation/pages/home_page.dart';
@@ -23,12 +22,11 @@ class EditorDrawer extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    SvgPicture.network(
-                      "https://chialisp.com/img/logo.svg",
-                      width: 35,
-                      height: 35,
-                      color: Colors.white,
-                    ),
+                    SvgPicture.network("https://chialisp.com/img/logo.svg",
+                        width: 35,
+                        height: 35,
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn)),
                     const Expanded(
                       child: SizedBox(),
                     ),
@@ -53,8 +51,7 @@ class EditorDrawer extends StatelessWidget {
             )),
         ListTile(
           leading: const Icon(Icons.add, color: Colors.white),
-          title:
-              const Text("New file", style: TextStyle(color: Colors.white)),
+          title: const Text("New file", style: TextStyle(color: Colors.white)),
           trailing: const Icon(
             Icons.keyboard_arrow_right,
             color: Colors.white,
