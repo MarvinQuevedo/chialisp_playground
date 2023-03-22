@@ -103,7 +103,7 @@ ThemeData appTheme(BuildContext context, Brightness brightness) {
             color: Colors.white,
             elevation: 0,
             systemOverlayStyle: getSystemOverlayStyle(context),
-            toolbarTextStyle: TextStyle(
+            toolbarTextStyle: const TextStyle(
               color: ThemeLigthText.darkText,
               fontSize: 18,
               fontWeight: FontWeight.w600,

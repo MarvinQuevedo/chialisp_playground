@@ -10,7 +10,7 @@ getSystemOverlayStyle(
   return SystemUiOverlayStyle(
       statusBarColor: topColor ??
           (brightness == Brightness.dark
-              ? Color(0xFF333333)
+              ? const Color(0xFF333333)
               : Theme.of(context).scaffoldBackgroundColor),
       // systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
       statusBarBrightness: brightness,

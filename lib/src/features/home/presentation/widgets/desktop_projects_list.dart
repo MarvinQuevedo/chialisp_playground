@@ -20,7 +20,7 @@ class DesktopProjectsList extends StatefulWidget {
 }
 
 class _DesktopProjectsListState extends State<DesktopProjectsList> {
-  double _width = 200;
+ final  double _width = 200;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
