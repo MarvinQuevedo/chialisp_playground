@@ -49,30 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  bech32:
-    dependency: transitive
-    description:
-      name: bech32
-      sha256: c36ff22d905b5864cafa7a3cf5e65dd2ca26cff30db1d6a9bd1bbfa2a231e58f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1"
-  bech32m:
-    dependency: transitive
-    description:
-      name: bech32m
-      sha256: "804c56e0ee5e22f95b435c8a9e62a738de38f51b8ddbb8e84e6bdfd53fc7c95a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.2"
-  bip39:
-    dependency: transitive
-    description:
-      name: bip39
-      sha256: de1ee27ebe7d96b84bb3a04a4132a0a3007dcdd5ad27dd14aa87a29d97c45edc
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6"
   boolean_selector:
     dependency: transitive
     description:
@@ -105,14 +81,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
-  chia_crypto_utils:
-    dependency: transitive
-    description:
-      name: chia_crypto_utils
-      sha256: "9cc54cc867c34f5ae0be23a819ab74004af3a1a3c1c4c0bb42f6272aab35f3c1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.16"
   clock:
     dependency: transitive
     description:
@@ -225,10 +193,11 @@ packages:
   flutter_chia_rust_utils:
     dependency: "direct main"
     description:
-      path: "../chia_rs/flutter-binding/flutter_chia_rust_utils"
-      relative: true
-    source: path
-    version: "1.0.0"
+      name: flutter_chia_rust_utils
+      sha256: "70c443db0f169e70ba8612704abc3199d744a0e23f73a7cc87b5858ba680c55b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.59+2"
   flutter_code_editor:
     dependency: "direct main"
     description:
@@ -312,14 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.5"
-  get_it:
-    dependency: transitive
-    description:
-      name: get_it
-      sha256: "290fde3a86072e4b37dbb03c07bec6126f0ecc28dad403c12ffe2e5a2d751ab7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.2.0"
   glob:
     dependency: transitive
     description:
@@ -376,14 +337,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  injector:
-    dependency: transitive
-    description:
-      name: injector
-      sha256: "2a683124c716e93b45521794f55bfe770e069cb3d871fc4fbc65b5acef78e832"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   io:
     dependency: transitive
     description:
@@ -648,14 +601,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.23.0"
-  quiver:
-    dependency: transitive
-    description:
-      name: quiver
-      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.1"
   responsive:
     dependency: "direct main"
     description:
