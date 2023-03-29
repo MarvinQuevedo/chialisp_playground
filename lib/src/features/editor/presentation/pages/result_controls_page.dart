@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chia_rust_utils/chia_bls.dart';
+import 'package:flutter_chia_rust_utils/flutter_chia_rust_utils.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
