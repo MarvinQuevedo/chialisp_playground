@@ -59,6 +59,9 @@ dependencies:
   responsive: ^0.3.11+11
   equatable: ^2.0.5
   get: ^4.6.5 
+  http: ^0.13.5
+  url_launcher: ^6.1.10
+ 
   
 
 dev_dependencies:
