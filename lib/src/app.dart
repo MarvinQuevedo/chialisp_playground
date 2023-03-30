@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(
           value: Get.find<ProjectsHandlerProvider>(),
         ),
-        Provider.value(
+        ChangeNotifierProvider.value(
           value: Get.find<PuzzleUncompressersProvider>(),
         ),
         ChangeNotifierProvider.value(
