@@ -1,11 +1,10 @@
 import 'dart:io';
 
-import 'package:chialisp_playground/src/features/editor/providers/playground_provider.dart';
-import 'package:chialisp_playground/src/features/editor/providers/projects_provider.dart';
+import '../../providers/projects_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../home/presentation/pages/home_page.dart';
+import '../../providers/projects_handler_provider.dart';
 import '../../utils/dir_splitter.dart';
 
 class ProjectsPage extends StatefulWidget {
@@ -40,41 +39,34 @@ class _ProjectsPageState extends State<ProjectsPage> {
                     itemCount: provider.projects!.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(fileName(provider.projects![index].path)),
-                        subtitle:
-                            Text(formatFileDate(provider.projects![index])),
-                        onTap: () {
-                          _openProject(provider.projects![index], context);
-                        },
-                        trailing: IconButton(
-                          icon: const Icon(Icons.keyboard_arrow_right),
-                          onPressed: () {
-                             _openProject(provider.projects![index], context);
+                          title: Text(fileName(provider.projects![index].path)),
+                          subtitle: Text(
+                            formatFileDate(
+                              provider.projects![index],
+                            ),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12),
+                          ),
+                          onTap: () {
+                            _openProject(context, provider.projects![index]);
                           },
-                        )
-                      );
+                          trailing: IconButton(
+                            icon: const Icon(Icons.keyboard_arrow_right),
+                            onPressed: () {
+                              _openProject(context, provider.projects![index]);
+                            },
+                          ));
                     },
                   ));
       },
     );
   }
 
-  void _openProject(File file, BuildContext context) async{
-    final provider = Provider.of<PlaygroundProvider>(context, listen: false);
-
-    await provider.loadProject(file);
-    _goToHomePage();
+  _openProject(BuildContext context, File file) {
+    Provider.of<ProjectsHandlerProvider>(context, listen: false)
+        .openProject(file, false);
+    Navigator.maybePop(context);
   }
-
-  void _goToHomePage() {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-        (route) => false);
-  }
-
- 
 
   String formatFileDate(File file) {
     final date = file.lastModifiedSync();
