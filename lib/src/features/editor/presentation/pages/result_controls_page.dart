@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
-import 'package:file_picker/file_picker.dart'; 
+import '../../utils/dir_splitter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chia_rust_utils/chia_bls.dart';
+import 'package:flutter_chia_rust_utils/flutter_chia_rust_utils.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
@@ -147,8 +147,8 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
                           if (building && isLast)
                             Center(
                               child: Column(
-                                children: [
-                                  const SizedBox(height: 10),
+                                children: const [
+                                  SizedBox(height: 10),
                                   CupertinoActivityIndicator(radius: 20),
                                 ],
                               ),

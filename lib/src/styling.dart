@@ -40,6 +40,8 @@ class AppTheme {
   static const Color primaryVariant = Color(0xffa6e22e);
   static const Color secondaryLigth = Color(0xffa6e22e);
   static const Color secondaryDark = Color(0xffa6e22e);
+  static const Color leftIconsColorDark = Color(0xff333333);
+  static const Color leftElementsBackColorDark = Color(0xff252525);
 
   static const Color notWhite = Color(0xFFEDF0F2);
   static const Color nearlyWhite = Color(0xFFFEFEFE);
@@ -77,8 +79,6 @@ class AppTheme {
     bodySmall: caption,
   );
 
-  static const _family = "Roboto";
-
   static const TextStyle display1Ligth = TextStyle(
     // h4 -> display1
 
@@ -107,7 +107,7 @@ class AppTheme {
     color: ThemeLigthText.darkerText,
   );
 
-  static final TextStyle subtitle = TextStyle(
+  static const TextStyle subtitle = TextStyle(
     // subtitle2 -> subtitle
 
     fontWeight: FontWeight.w400,
@@ -116,7 +116,7 @@ class AppTheme {
     color: ThemeLigthText.darkText,
   );
 
-  static final TextStyle body2 = TextStyle(
+  static const TextStyle body2 = TextStyle(
     // body1 -> body2
 
     fontWeight: FontWeight.w400,
@@ -125,7 +125,7 @@ class AppTheme {
     color: ThemeLigthText.darkText,
   );
 
-  static final TextStyle body1 = TextStyle(
+  static const TextStyle body1 = TextStyle(
     // body2 -> body1
 
     fontWeight: FontWeight.w400,
@@ -134,7 +134,7 @@ class AppTheme {
     color: ThemeLigthText.darkText,
   );
 
-  static final TextStyle caption = TextStyle(
+  static const TextStyle caption = TextStyle(
     // Caption -> caption
 
     fontWeight: FontWeight.w400,
@@ -142,7 +142,7 @@ class AppTheme {
     letterSpacing: 0.2,
     color: ThemeLigthText.lightText,
   );
-  static final TextStyle button = TextStyle(
+  static const TextStyle button = TextStyle(
     // Caption -> caption
 
     fontWeight: FontWeight.w400,

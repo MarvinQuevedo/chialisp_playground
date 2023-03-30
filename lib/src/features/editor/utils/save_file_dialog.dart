@@ -1,9 +1,9 @@
-import 'package:chialisp_playground/src/features/editor/utils/error_dialog.dart';
+import '../providers/projects_handler_provider.dart';
+import 'error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/playground_provider.dart';
+ 
 import 'snackbar.dart';
 
 Future<String?> showSaveFileDialog(BuildContext context, String content,
@@ -11,8 +11,8 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
   //show dialog for insert name with TextEditingController
   final textController = TextEditingController();
   final tagColor = monokaiSublimeTheme['tag']!.color!;
-  final playgroundProvider =
-      Provider.of<PlaygroundProvider>(context, listen: false);
+  final proHandler =
+      Provider.of<ProjectsHandlerProvider>(context, listen: false);
   final fileName = await showDialog(
       context: context,
       builder: (context) {
@@ -24,6 +24,7 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
               Expanded(
                 child: TextField(
                     controller: textController,
+                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: "Insert file name",
                       labelStyle: const TextStyle(
@@ -82,7 +83,7 @@ Future<String?> showSaveFileDialog(BuildContext context, String content,
         );
       });
   if (fileName != null) {
-    await playgroundProvider.saveProject(
+    await proHandler.saveProject(
       fileName + ".clsp",
       content,
     );

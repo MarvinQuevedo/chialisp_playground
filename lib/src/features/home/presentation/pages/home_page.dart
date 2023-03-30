@@ -1,10 +1,9 @@
+import 'package:chialisp_playground/src/features/home/presentation/pages/desktop_home_page.dart';
+import 'package:chialisp_playground/src/features/home/presentation/pages/mobile_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../editor/models/run_type.dart';
-import '../../../editor/presentation/pages/editor_page.dart';
-import '../../../editor/providers/playground_provider.dart';
-import '../../../editor/utils/default_clsp_project.dart';
+import 'package:responsive/responsive.dart';
+import '../../../editor/providers/projects_handler_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,11 +15,26 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<PlaygroundProvider>(builder: (context, provider, child) {
-      return EditorPage(
-        orignalCode: provider.activeProjectCode ?? defaultClspProject,
-        runType: RunType.run,
-      );
-    });
+    return Consumer<ProjectsHandlerProvider>(
+      builder: (context, projectsHandler, child) {
+        return FlexBuilderWidget(
+          builder: (BuildContext context, double width, double offset,
+              ScreenSize size) {
+            switch (size) {
+              case ScreenSize.sm:
+              case ScreenSize.xs:
+              case ScreenSize.md:
+                return const MobileHomePage();
+
+              case ScreenSize.lg:
+              case ScreenSize.xl:
+              case ScreenSize.xxl:
+              case ScreenSize.xxxl:
+                return const DesktopHomePage();
+            }
+          },
+        );
+      },
+    );
   }
 }

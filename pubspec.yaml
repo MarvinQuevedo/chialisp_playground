@@ -37,8 +37,7 @@ dependencies:
     git:
       url: https://github.com/MarvinQuevedo/flutter-code-editor.git
       ref: main
-  flutter_chia_rust_utils:
-    path: ../chia_rs/flutter-binding/flutter_chia_rust_utils 
+  flutter_chia_rust_utils: ^0.0.59+4
   file_picker: ^5.2.6
  
   
@@ -57,6 +56,9 @@ dependencies:
   flutter_svg: ^2.0.4
   shared_preferences: ^2.0.18
   share_plus: ^6.3.1
+  responsive: ^0.3.11+11
+  equatable: ^2.0.5
+  get: ^4.6.5 
   
 
 dev_dependencies:
@@ -84,6 +86,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/puzzles.zip
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

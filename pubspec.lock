@@ -49,30 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  bech32:
-    dependency: transitive
-    description:
-      name: bech32
-      sha256: c36ff22d905b5864cafa7a3cf5e65dd2ca26cff30db1d6a9bd1bbfa2a231e58f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1"
-  bech32m:
-    dependency: transitive
-    description:
-      name: bech32m
-      sha256: "804c56e0ee5e22f95b435c8a9e62a738de38f51b8ddbb8e84e6bdfd53fc7c95a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.2"
-  bip39:
-    dependency: transitive
-    description:
-      name: bip39
-      sha256: de1ee27ebe7d96b84bb3a04a4132a0a3007dcdd5ad27dd14aa87a29d97c45edc
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6"
   boolean_selector:
     dependency: transitive
     description:
@@ -105,14 +81,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
-  chia_crypto_utils:
-    dependency: transitive
-    description:
-      name: chia_crypto_utils
-      sha256: "9cc54cc867c34f5ae0be23a819ab74004af3a1a3c1c4c0bb42f6272aab35f3c1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.16"
   clock:
     dependency: transitive
     description:
@@ -178,7 +146,7 @@ packages:
     source: hosted
     version: "1.0.5"
   equatable:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: equatable
       sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
@@ -225,10 +193,11 @@ packages:
   flutter_chia_rust_utils:
     dependency: "direct main"
     description:
-      path: "../chia_rs/flutter-binding/flutter_chia_rust_utils"
-      relative: true
-    source: path
-    version: "1.0.0"
+      name: flutter_chia_rust_utils
+      sha256: a13d80a05c3e4d33cef01f805921886785ad195bdec57be70f357cc2940d6b0a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.59+4"
   flutter_code_editor:
     dependency: "direct main"
     description:
@@ -304,14 +273,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.0"
-  get_it:
-    dependency: transitive
+  get:
+    dependency: "direct main"
     description:
-      name: get_it
-      sha256: "290fde3a86072e4b37dbb03c07bec6126f0ecc28dad403c12ffe2e5a2d751ab7"
+      name: get
+      sha256: "2ba20a47c8f1f233bed775ba2dd0d3ac97b4cf32fc17731b3dfc672b06b0e92a"
       url: "https://pub.dev"
     source: hosted
-    version: "7.2.0"
+    version: "4.6.5"
   glob:
     dependency: transitive
     description:
@@ -368,14 +337,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  injector:
-    dependency: transitive
-    description:
-      name: injector
-      sha256: "2a683124c716e93b45521794f55bfe770e069cb3d871fc4fbc65b5acef78e832"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   io:
     dependency: transitive
     description:
@@ -640,14 +601,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.23.0"
-  quiver:
-    dependency: transitive
+  responsive:
+    dependency: "direct main"
     description:
-      name: quiver
-      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
+      name: responsive
+      sha256: b0bd1247b31b416d7f821ef3a77669289299fd420e13010184f140494fd810d1
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "0.3.11+11"
   scrollable_positioned_list:
     dependency: transitive
     description:

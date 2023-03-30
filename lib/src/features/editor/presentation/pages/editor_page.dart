@@ -1,45 +1,187 @@
-import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
-
-import 'result_controls_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/run_type.dart';
+import '../../providers/editor_actions_provider.dart';
 import '../../providers/playground_provider.dart';
+import '../../providers/projects_handler_provider.dart';
+import '../../providers/projects_provider.dart';
+import '../../providers/puzzles_uncompresser_provider.dart';
 import '../../utils/chialisp.dart';
-import 'package:ionicons/ionicons.dart';
-
-import '../../utils/monokaiSublimeThemeWithFont.dart';
+import '../../utils/dir_splitter.dart';
+import '../../utils/monokai_sublime_theme_with_font.dart';
 import '../../utils/save_file_dialog.dart';
 import '../../utils/snackbar.dart';
 import '../widgets/editor_drawer.dart';
+import 'result_controls_page.dart';
 
 class EditorPage extends StatefulWidget {
-  final String orignalCode;
-  final RunType runType;
+  final PreferredSizeWidget? appBar;
+  final bool showAppBard;
+  final bool showBottomMenu;
   const EditorPage(
-      {super.key, required this.orignalCode, required this.runType});
+      {super.key,
+      this.appBar,
+      this.showAppBard = true,
+      this.showBottomMenu = true});
 
   @override
-  State<EditorPage> createState() => _EditorPageState();
+  State<EditorPage> createState() => EditorPageState();
 }
 
-class _EditorPageState extends State<EditorPage> {
+class EditorPageState extends State<EditorPage> with EditorActionHelper {
   String? lastCode;
   late final CodeController _controller;
   Map<String, TextStyle> theme = monokaiSublimeTheme;
   late final FocusNode _editorFocusNode;
   bool _editorInitialized = false;
+  late final PlaygroundProvider _playProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return ChangeNotifierProvider.value(
+      value: _playProvider,
+      child: Builder(builder: (context) {
+        return Consumer<PlaygroundProvider>(
+          builder: (context, playProvider, child) {
+            PreferredSizeWidget? appBar2 = AppBar(
+              backgroundColor: const Color.fromARGB(255, 14, 15, 13),
+              title:
+                  Text(playProvider.activeProjectName ?? "ChiaLisp Playground"),
+              elevation: 0,
+              actions: [
+                IconButton(
+                  onPressed: () => undoCode(),
+                  icon: const Icon(Ionicons.arrow_undo),
+                  iconSize: 30,
+                ),
+                IconButton(
+                  onPressed: () => redoCode(),
+                  icon: const Icon(Ionicons.arrow_redo),
+                  iconSize: 30,
+                ),
+                IconButton(
+                  onPressed: () => saveFile(),
+                  icon: const Icon(Ionicons.save),
+                  iconSize: 35,
+                ),
+                IconButton(
+                  onPressed: () => openRunPage(),
+                  icon: const Icon(Ionicons.play_circle_outline),
+                  iconSize: 40,
+                ),
+              ],
+            );
+            if (widget.appBar != null) {
+              appBar2 = widget.appBar;
+            } else if (!widget.showAppBard) {
+              appBar2 = null;
+            }
+            return SafeArea(
+              child: Container(
+                color: theme['root']!.backgroundColor,
+                child: Scaffold(
+                  backgroundColor: theme['root']!.backgroundColor,
+                  appBar: appBar2,
+                  drawer: const EditorDrawer(),
+                  body: ListView(
+                    padding: const EdgeInsets.only(top: 0),
+                    children: [
+                      CodeTheme(
+                        data: CodeThemeData(
+                          styles: monokaiSublimeThemeWithFont("JetBrainsMono"),
+                        ),
+                        child: SizedBox(
+                          width: size.width,
+                          child: CodeField(
+                            controller: _controller,
+                            focusNode: _editorFocusNode,
+                            lineNumberBuilder: (number, style) {
+                              return TextSpan(
+                                text: number.toString(),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    backgroundColor: Colors.red),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  bottomSheet: widget.showBottomMenu
+                      ? Container(
+                          color: const Color.fromARGB(255, 14, 15, 13),
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 10, bottom: 10),
+                          width: size.width,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: "\t",
+                                  maxWidth: 45,
+                                  child: const Text("TAB"),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: "(",
+                                  child: const Text("("),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: ")",
+                                  child: const Text(")"),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: ";",
+                                  child: const Text(";"),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: ".",
+                                  child: const Text("."),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: "'",
+                                  child: const Text("'"),
+                                ),
+                                _ActionButton(
+                                  onPressed: addChar,
+                                  value: "\"",
+                                  child: const Text("\""),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
 
   @override
   void initState() {
     _editorFocusNode = FocusNode();
     _controller = CodeController(
-      text: widget.orignalCode, // Initial code
+      text: "", // Initial code
       language: chiaLisp,
     );
+    _playProvider = PlaygroundProvider(_controller);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _initEditor();
@@ -49,127 +191,61 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final playProvider = Provider.of<PlaygroundProvider>(context);
-    return SafeArea(
-      child: Container(
-        color: theme['root']!.backgroundColor,
-        child: Scaffold(
-          backgroundColor: theme['root']!.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 14, 15, 13),
-            title:
-                Text(playProvider.activeProjectName ?? "ChiaLisp Playground"),
-            elevation: 0,
-            actions: [
-               IconButton(
-                onPressed: () => _undoCode(context),
-                icon: const Icon(Ionicons.arrow_undo),
-                iconSize: 30,
-              ),
-               IconButton(
-                onPressed: () => _redoCode(context),
-                icon: const Icon(Ionicons.arrow_redo),
-                iconSize: 30,
-              ),
-              IconButton(
-                onPressed: () => _saveFile(context),
-                icon: const Icon(Ionicons.save),
-                iconSize: 35,
-              ),
-              IconButton(
-                onPressed: () => _openRunPage(context),
-                icon: const Icon(Ionicons.play_circle_outline),
-                iconSize: 40,
-              ),
-            ],
-          ),
-          drawer: const EditorDrawer(),
-          body: ListView(
-            padding: const EdgeInsets.only(top: 0),
-            children: [
-              CodeTheme(
-                data: CodeThemeData(
-                  styles: monokaiSublimeThemeWithFont("JetBrainsMono"),
-                ),
-                child: SizedBox(
-                  width: size.width,
-                  child: CodeField(
-                    controller: _controller,
-                    focusNode: _editorFocusNode,
-                    lineNumberBuilder: (number, style) {
-                      return TextSpan(
-                        text: number.toString(),
-                        style: const TextStyle(
-                            color: Colors.white, backgroundColor: Colors.red),
-                      );
-                    },
+  void openRunPage() async {
+    final activeProject = _playProvider.activeProject;
+
+    if (activeProject == null) {
+      await saveFile(title: "Save file first");
+    } else {
+      _playProvider.saveProject(
+        fileName(activeProject.path),
+        _controller.text,
+      );
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider.value(
+                value: _playProvider,
+                child: Builder(
+                  builder: (context) => ResultControlsPage(
+                    code: _controller.text,
+                    theme: theme,
                   ),
-                ),
-              ),
-            ],
-          ),
-          bottomSheet: Container(
-            color: const Color.fromARGB(255, 14, 15, 13),
-            padding:
-                const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
-            width: size.width,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: "\t",
-                    maxWidth: 45,
-                    child: const Text("TAB"),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: "(",
-                    child: const Text("("),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: ")",
-                    child: const Text(")"),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: ";",
-                    child: const Text(";"),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: ".",
-                    child: const Text("."),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: "'",
-                    child: const Text("'"),
-                  ),
-                  ActionButton(
-                    onPressed: _addChar,
-                    value: "\"",
-                    child: const Text("\""),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+                )),
+          ));
+    }
   }
 
-  void _initEditor() {
-    final playPro = Provider.of<PlaygroundProvider>(context, listen: false);
-    _controller.autocompleter.setCustomWords(playPro.includeFilesNames);
-    _editorFocusNode.addListener(_forceInitializedEditor);
-    FocusScope.of(context).requestFocus(_editorFocusNode);
+  @override
+  void redoCode() {
+    _controller.historyController.redo();
+  }
+
+  @override
+  Future<String?> saveFile({String title = 'Save file'}) async {
+    final activeProject = _playProvider.activeProject;
+    if (activeProject == null) {
+      return showSaveFileDialog(context, _controller.text, title: title);
+    } else {
+      await _playProvider.saveProject(
+          fileName(activeProject.path), _controller.text);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
+        content: Text("File saved", style: TextStyle(color: Colors.white)),
+      ));
+      return null;
+    }
+  }
+
+  @override
+  void undoCode() {
+    _controller.historyController.undo();
+  }
+
+  @override
+  void addChar(String value) {
+    _controller.insertStr(value);
   }
 
   void _forceInitializedEditor() {
@@ -181,70 +257,79 @@ class _EditorPageState extends State<EditorPage> {
     }
   }
 
-  void _addChar(value) {
-    _controller.insertStr(value);
+  void _initEditor() {
+    final puzzlesProvider = Provider.of<PuzzleUncompressersProvider>(
+      context,
+      listen: false,
+    );
+    final projectsProvider = Provider.of<ProjectsProvider>(
+      context,
+      listen: false,
+    );
+    final proHandler = Provider.of<ProjectsHandlerProvider>(
+      context,
+      listen: false,
+    );
+    projectsProvider.addListener(_updateProjectsNames);
+    _playProvider
+        .init(
+            rootBundle: rootBundle,
+            appDocDir: puzzlesProvider.appDocDir,
+            projectsFilesNames: puzzlesProvider.puzzlesFilesNames,
+            puzzlesFilesNames: projectsProvider.projectsFilesNames,
+            file: proHandler.currentProject?.file)
+        .then((value) {
+      _controller.autocompleter.setCustomWords(_playProvider.includeFilesNames);
+      _editorFocusNode.addListener(_forceInitializedEditor);
+      FocusScope.of(context).requestFocus(_editorFocusNode);
+    });
+
+    _playProvider.savedNotifier.addListener(_onTextChanged);
+    _controller.addListener(_onTextChanged);
+    EditorActionsProvider.of(context, listen: false).editorActionHelper = this;
   }
 
-  _openRunPage(BuildContext context) async {
-    final playProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    final activeProject = playProvider.activeProject;
-
-    if (activeProject == null) {
-      await _saveFile(context, title: "Save file first");
-    } else {
-      playProvider.saveProject(
-        fileName(activeProject.path)  ,
-        _controller.text,
-      );
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultControlsPage(
-            code: _controller.text,
-            theme: theme,
-          ),
-        ),
-      );
-    }
+  @override
+  void dispose() {
+    _playProvider.savedNotifier.removeListener(_onTextChanged);
+    _controller.removeListener(_onTextChanged);
+    super.dispose();
   }
 
-  Future<String?> _saveFile(BuildContext context,
-      {String title = 'Save file'}) async {
-    final playProvider =
-        Provider.of<PlaygroundProvider>(context, listen: false);
-    final activeProject = playProvider.activeProject;
-    if (activeProject == null) {
-      return showSaveFileDialog(context, _controller.text, title: title);
-    } else {
-    
-      await playProvider.saveProject(fileName(activeProject.path), _controller.text);
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
-        content: Text("File saved", style: TextStyle(color: Colors.white)),
+  void _updateProjectsNames() {
+    final projectsProvider = Provider.of<ProjectsProvider>(
+      context,
+      listen: false,
+    );
+    _playProvider.updateProjectsFilesNames(projectsProvider.projectsFilesNames);
+  }
+
+  void _onTextChanged() {
+    final proHandler = Provider.of<ProjectsHandlerProvider>(
+      context,
+      listen: false,
+    );
+    final saved = _playProvider.savedNotifier.value;
+
+    final activeProject = proHandler.currentProject;
+    if (activeProject != null) {
+      proHandler.onChangeText(
+          projectData: activeProject, value: _controller.text);
+      proHandler.updateValue(activeProject.copyWith(
+        saved: saved,
       ));
-      return null;
     }
-  }
-  
-  _undoCode(BuildContext context) {
-    _controller.historyController.undo();
-  }
-  
-  _redoCode(BuildContext context) {
-    _controller.historyController.redo();
   }
 }
 
-class ActionButton extends StatelessWidget {
+class _ActionButton extends StatelessWidget {
   final Widget child;
-  final ValueChanged onPressed;
+  final ValueChanged<String> onPressed;
   final String value;
   final double maxWidth;
-  const ActionButton(
-      {super.key,
-      required this.child,
+
+  const _ActionButton(
+      {required this.child,
       required this.onPressed,
       required this.value,
       this.maxWidth = 40});
