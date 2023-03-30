@@ -128,6 +128,7 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     final proIndex = getProjectIndex(value);
     if (proIndex != null) {
       _projects[proIndex] = value;
+      notifyListeners();
     }
   }
 
@@ -139,7 +140,7 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   bool isSaved(ProjectData project) {
     final proIndex = getProjectIndex(project);
     if (proIndex != null) {
-      TempRepository.instance.get(project.id);
+      return TempRepository.instance.get(project.id)== null;
     }
     return false;
   }
