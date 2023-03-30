@@ -52,7 +52,7 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   void openProject(File file, bool readOnly) {
     final projectData = ProjectData(file, readOnly, _calculateId(file));
     if (!projects.contains(projectData)) {
-      _projects[projects.length+1] = projectData;
+      _projects[projects.length + 1] = projectData;
       _currentProject = projectData;
       _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
       notifyListeners();
@@ -112,6 +112,21 @@ class ProjectsHandlerProvider extends ChangeNotifier {
       _currentProject = null;
     }
 
+    notifyListeners();
+  }
+
+  void closeAllRighProjects(ProjectData projectData) {
+    var proIndex = getProjectIndex(projectData);
+
+    if (proIndex != null) {
+      _projects.removeWhere((key, value) => key > proIndex);
+      if (_currentProject != null) {
+        final activeProjectIndex = getProjectIndex(_currentProject!);
+        if (activeProjectIndex == null) {
+          openProject(projectData.file, projectData.readOnly);
+        }
+      }
+    }
     notifyListeners();
   }
 

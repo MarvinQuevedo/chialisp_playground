@@ -153,6 +153,17 @@ class _TopHeaderProjectState extends State<TopHeaderProject> {
           onTap: () => ProjectsHandlerProvider.of(context, listen: false)
               .closeAllProjects(keepProject: widget.project),
         ),
+        PopupMenuItem(
+          value: 2,
+          padding: padding,
+          height: height,
+          child: const Text(
+            'Close all right',
+            style: TextStyle(fontSize: 14),
+          ),
+          onTap: () => ProjectsHandlerProvider.of(context, listen: false)
+              .closeAllRighProjects(widget.project),
+        ),
       ],
     );
   }
