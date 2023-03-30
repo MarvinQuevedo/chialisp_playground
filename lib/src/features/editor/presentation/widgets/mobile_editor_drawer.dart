@@ -1,15 +1,11 @@
-import 'dart:io';
-
-import 'package:chialisp_playground/src/features/editor/providers/puzzles_uncompresser_provider.dart';
+ 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-
-import '../../../home/presentation/pages/home_page.dart';
-import '../../providers/playground_provider.dart';
+ 
 import '../../providers/projects_handler_provider.dart';
 import '../../utils/save_file_dialog.dart';
-import '../../utils/show_install_cipher_libs.dart';
+import '../../utils/show_install_cypher_libs.dart';
 import '../pages/projects_page.dart';
 
 class MobileEditorDrawer extends StatelessWidget {
@@ -74,12 +70,12 @@ class MobileEditorDrawer extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.install_mobile, color: Colors.white),
-          title: const Text("Install Cipher", style: TextStyle(color: Colors.white)),
+          title: const Text("Install Cypher", style: TextStyle(color: Colors.white)),
           trailing: const Icon(
             Icons.keyboard_arrow_right,
             color: Colors.white,
           ),
-          onTap: () => _installCipherLib(context),
+          onTap: () =>  showInstallCipherLibs(context),
         ),
       ]),
     );
@@ -100,9 +96,6 @@ class MobileEditorDrawer extends StatelessWidget {
     });
   }
   
-  _installCipherLib(BuildContext context) {
-    showInstallCipherLibs(context);
-
-  }
+ 
    
 }
