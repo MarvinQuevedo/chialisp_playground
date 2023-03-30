@@ -52,7 +52,7 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   void openProject(File file, bool readOnly) {
     final projectData = ProjectData(file, readOnly, _calculateId(file));
     if (!projects.contains(projectData)) {
-      _projects[projects.length] = projectData;
+      _projects[projects.length+1] = projectData;
       _currentProject = projectData;
       _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
       notifyListeners();
@@ -103,8 +103,15 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeAllProjects() {
-    _projects = {};
+  void closeAllProjects({ProjectData? keepProject}) {
+    if (keepProject != null) {
+      _projects = {0: keepProject};
+      _currentProject = keepProject;
+    } else {
+      _projects = {};
+      _currentProject = null;
+    }
+
     notifyListeners();
   }
 
@@ -150,6 +157,6 @@ class ProjectsHandlerProvider extends ChangeNotifier {
 
   void deleteTempFile(ProjectData value) {
     TempRepository.instance.remove(value.id);
-      notifyListeners();
+    notifyListeners();
   }
 }

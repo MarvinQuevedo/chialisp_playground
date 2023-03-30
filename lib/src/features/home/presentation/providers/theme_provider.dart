@@ -8,7 +8,7 @@ class ThemeProvider extends ChangeNotifier {
   Brightness get brightness => _brightness;
 
   double get projecftListFontSize => 13.0;
-  double get topProjectsListFontSize => 13.0;
+  double get topProjectsListFontSize => 12.0;
 
 
   set brightness(Brightness value) {
