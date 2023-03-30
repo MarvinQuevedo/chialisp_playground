@@ -213,4 +213,8 @@ class PlaygroundProvider extends ChangeNotifier {
     }
     return tempFolder;
   }
+
+  void updatePuzzlesNames(List<String> puzzlesFilesNames) {
+    updateProjectsFilesNames(puzzlesFilesNames);
+  }
 }

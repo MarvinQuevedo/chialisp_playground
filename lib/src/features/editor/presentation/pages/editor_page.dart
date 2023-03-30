@@ -15,7 +15,7 @@ import '../../utils/dir_splitter.dart';
 import '../../utils/monokai_sublime_theme_with_font.dart';
 import '../../utils/save_file_dialog.dart';
 import '../../utils/snackbar.dart';
-import '../widgets/editor_drawer.dart';
+import '../widgets/mobile_editor_drawer.dart';
 import 'result_controls_page.dart';
 
 class EditorPage extends StatefulWidget {
@@ -87,7 +87,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
                 child: Scaffold(
                   backgroundColor: theme['root']!.backgroundColor,
                   appBar: appBar2,
-                  drawer: const EditorDrawer(),
+                  drawer: const MobileEditorDrawer(),
                   body: ListView(
                     padding: const EdgeInsets.only(top: 0),
                     children: [
@@ -256,6 +256,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       _editorFocusNode.removeListener(_forceInitializedEditor);
     }
   }
+  
 
   void _initEditor() {
     final puzzlesProvider = Provider.of<PuzzleUncompressersProvider>(
@@ -270,6 +271,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       context,
       listen: false,
     );
+    puzzlesProvider.addListener(_puzzlesUpdated);
     projectsProvider.addListener(_updateProjectsNames);
     _playProvider
         .init(
@@ -319,6 +321,14 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
         saved: saved,
       ));
     }
+  }
+
+  void _puzzlesUpdated() {
+    final puzzlesProvider = Provider.of<PuzzleUncompressersProvider>(
+      context,
+      listen: false,
+    );
+    _playProvider.updatePuzzlesNames(puzzlesProvider.puzzlesFilesNames);
   }
 }
 
