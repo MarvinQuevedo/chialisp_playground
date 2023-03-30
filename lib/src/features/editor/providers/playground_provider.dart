@@ -21,11 +21,8 @@ class PlaygroundProvider extends ChangeNotifier {
 
   PlaygroundProvider(this._controller);
 
- 
-
   File? _activeProject;
   File? get activeProject => _activeProject;
- 
 
   final _saved = ValueNotifier(false);
   bool get saved => _saved.value;
@@ -140,10 +137,12 @@ class PlaygroundProvider extends ChangeNotifier {
       return defaultClspProject;
     }
     _activeProject = file;
-    final tempData = TempRepository.instance.get(activeProjectName ?? "...");
-    if (tempData != null) {
+    final tempData = TempRepository.instance.get(file.absolute.path);
+    if (tempData != null && tempData.isNotEmpty) {
       _controller.text = tempData;
-      _activeProjectCode = tempData;
+      final fileData = await file.readAsString();
+      _activeProjectCode = fileData;
+
       developer.log("loadProject: $tempData", name: "PlaygroundProvider");
       _saved.value = false;
       return tempData;
@@ -170,7 +169,7 @@ class PlaygroundProvider extends ChangeNotifier {
 
     await loadProject(file);
     _saved.value = false;
-    TempRepository.instance.remove(activeProject?.absolute.path??"....");
+    TempRepository.instance.remove(activeProject?.absolute.path ?? "....");
     return true;
   }
 
@@ -221,6 +220,6 @@ class PlaygroundProvider extends ChangeNotifier {
   }
 
   void removeTempFile(ProjectData? activeProject) {
-     TempRepository.instance.remove(activeProject?.id??"");
+    TempRepository.instance.remove(activeProject?.id ?? "");
   }
 }

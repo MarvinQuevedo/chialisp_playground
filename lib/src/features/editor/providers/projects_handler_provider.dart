@@ -116,12 +116,15 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   }
 
   void onChangeText(
-      {required ProjectData projectData, required String value}) async {
-    final stopWatch = Stopwatch()..start();
+      {required ProjectData projectData,
+      required String value,
+      bool? saved}) async {
     TempRepository.instance.set(projectData.id, value);
-    updateValue(projectData.copyWith(saved: true));
-    stopWatch.stop();
-    developer.log("onChangeText: ${stopWatch.elapsedMilliseconds}");
+    if (saved != null && saved == true) {
+      TempRepository.instance.remove(projectData.id);
+    }
+    updateValue(projectData.copyWith(saved: saved ?? true));
+    developer.log("onChangeText: ${value.length}");
   }
 
   void updateValue(ProjectData value) {
@@ -140,8 +143,13 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   bool isSaved(ProjectData project) {
     final proIndex = getProjectIndex(project);
     if (proIndex != null) {
-      return TempRepository.instance.get(project.id)== null;
+      return TempRepository.instance.get(project.id) == null;
     }
     return false;
+  }
+
+  void deleteTempFile(ProjectData value) {
+    TempRepository.instance.remove(value.id);
+      notifyListeners();
   }
 }

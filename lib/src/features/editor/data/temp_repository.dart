@@ -15,14 +15,18 @@ class TempRepository {
   Timer? _timer;
   Directory? _appDocDic;
   TempRepository._();
-  final  _temp = <String, String>{};
+  final _temp = <String, String>{};
 
   void set(String key, String value) {
     _temp[key] = value;
+    _writeData();
+  }
+
+  void _writeData() {
     if (_timer != null) {
       _timer!.cancel();
     }
-    _timer = Timer(const Duration(seconds: 2), () async {
+    _timer = Timer(const Duration(milliseconds: 750), () async {
       /*  _lastSaved = DateTime.now();
       _lastSavedData = value; */
       final watch = Stopwatch()..start();
@@ -69,5 +73,8 @@ class TempRepository {
 
   String? get(String key) => _temp[key];
 
-  void remove(String key) => _temp.remove(key);
+  void remove(String key) {
+    _temp.remove(key);
+      _writeData();
+  }
 }

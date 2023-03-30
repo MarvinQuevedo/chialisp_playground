@@ -3,6 +3,7 @@ import 'package:chialisp_playground/src/features/home/presentation/widgets/top_h
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../editor/providers/editor_actions_provider.dart';
 import '../../../editor/providers/projects_handler_provider.dart';
 
 class DesktopEditorHeader extends StatelessWidget {
@@ -60,8 +61,43 @@ class DesktopEditorHeader extends StatelessWidget {
       context,
       listen: false,
     );
-    proHandler.closeProject(
-      value,
-    );
+    final editor =
+        EditorActionsProvider.of(context, listen: false).editorActionHelper!;
+    final isSaved = proHandler.isSaved(value);
+    if (!isSaved) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Save file?"),
+          content: const Text("Do you want to save the file?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                proHandler.deleteTempFile(value);
+                proHandler.closeProject(
+                  value,
+                );
+              },
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                editor.saveFile();
+                proHandler.closeProject(
+                  value,
+                );
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        ),
+      );
+    } else {
+      proHandler.closeProject(
+        value,
+      );
+    }
   }
 }

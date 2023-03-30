@@ -1,4 +1,3 @@
-import 'package:chialisp_playground/src/features/editor/data/temp_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -40,6 +39,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   late final FocusNode _editorFocusNode;
   bool _editorInitialized = false;
   late final PlaygroundProvider _playProvider;
+  ProjectData? _projectData;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +273,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       context,
       listen: false,
     );
+    _projectData = proHandler.currentProject;
     puzzlesProvider.addListener(_puzzlesUpdated);
     projectsProvider.addListener(_updateProjectsNames);
     _playProvider
@@ -286,10 +287,10 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       _controller.autocompleter.setCustomWords(_playProvider.includeFilesNames);
       _editorFocusNode.addListener(_forceInitializedEditor);
       FocusScope.of(context).requestFocus(_editorFocusNode);
+      _playProvider.savedNotifier.addListener(_onTextChanged);
+      _controller.addListener(_onTextChanged);
     });
 
-    _playProvider.savedNotifier.addListener(_onTextChanged);
-    _controller.addListener(_onTextChanged);
     EditorActionsProvider.of(context, listen: false).editorActionHelper = this;
   }
 
@@ -309,27 +310,26 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   void _onTextChanged() {
+    if (!mounted) return;
     final proHandler = Provider.of<ProjectsHandlerProvider>(
       context,
       listen: false,
     );
     var saved = _playProvider.savedNotifier.value;
-    final activeProject = proHandler.currentProject;
 
-    if (activeProject != null) {
+    if (_controller.text == _playProvider.activeProjectCode) {
+      saved = true;
+    }else{
+      saved = false;
+    }
+
+    if (_projectData != null) {
       proHandler.onChangeText(
-        projectData: activeProject,
+        projectData: _projectData!,
         value: _controller.text,
-      );
-   
-      if (_playProvider.activeProjectCode == _controller.text) {
-        saved = true;
-        _playProvider.removeTempFile(activeProject);
-      }
-   
-      proHandler.updateValue(activeProject.copyWith(
         saved: saved,
-      ));
+      );
+     
     }
   }
 
