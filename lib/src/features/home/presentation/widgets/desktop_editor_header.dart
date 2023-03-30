@@ -10,35 +10,39 @@ class DesktopEditorHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final proHandler = Provider.of<ProjectsHandlerProvider>(context);
-    final openProjects = proHandler.projects.toList();
-    final projectsItems = openProjects
-        .map<Widget>((e) => TopHeaderProject(
-            project: e,
-            isActive: proHandler.currentProject == e,
-            onTap: (value) => _openProject(context, value),
-            onClose: (value) => _closeProject(context, value),
-            modified: false))
-        .toList();
+    return Consumer<ProjectsHandlerProvider>(
+      builder: (context, value, child) {
+        final proHandler = Provider.of<ProjectsHandlerProvider>(context);
+        final openProjects = proHandler.projects.toList();
+        final projectsItems = openProjects
+            .map<Widget>((e) => TopHeaderProject(
+                project: e,
+                isActive: proHandler.currentProject == e,
+                onTap: (value) => _openProject(context, value),
+                onClose: (value) => _closeProject(context, value),
+                modified: false))
+            .toList();
 
-    final size = MediaQuery.of(context).size;
-    return Container(
-      height: 42,
-      decoration: BoxDecoration(
-        color: ThemeProvider.of(context).leftIconsColorDark,
-      ),
-      width: size.width ,
-      child: Scrollbar( 
-        child: SingleChildScrollView(
-          primary: true,
-          physics: const BouncingScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: projectsItems),
-        ),
-      ),
+        final size = MediaQuery.of(context).size;
+        return Container(
+          height: 42,
+          decoration: BoxDecoration(
+            color: ThemeProvider.of(context).leftIconsColorDark,
+          ),
+          width: size.width,
+          child: Scrollbar(
+            child: SingleChildScrollView(
+              primary: true,
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: projectsItems),
+            ),
+          ),
+        );
+      },
     );
   }
 
