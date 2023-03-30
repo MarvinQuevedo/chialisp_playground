@@ -41,8 +41,10 @@ class ProjectsProvider extends ChangeNotifier {
         if (ext == "zip") {
           element.delete();
           return;
+        }else if(ext == "clsp"){
+           _projects?.add(element);
         }
-        _projects?.add(element);
+       
       }
     });
     notifyListeners();
