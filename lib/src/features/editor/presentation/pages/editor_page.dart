@@ -192,7 +192,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   @override
-  void openRunPage() async {
+  void openRunPage({bool isDesktop = false}) async {
     final activeProject = _playProvider.activeProject;
 
     if (activeProject == null) {
@@ -202,19 +202,48 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
         fileName(activeProject.path),
         _controller.text,
       );
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChangeNotifierProvider.value(
-                value: _playProvider,
-                child: Builder(
-                  builder: (context) => ResultControlsPage(
-                    code: _controller.text,
-                    theme: theme,
+      if (isDesktop) {
+        showGeneralDialog(
+            barrierColor: const Color(0x80000000),
+            context: context,
+            barrierDismissible: true,
+            barrierLabel: "close",
+            pageBuilder: (context, a, b) {
+              return Align(
+                alignment: Alignment.topRight,
+                child: Dialog(
+                  elevation: 5,
+                  shadowColor: Colors.white,
+                  backgroundColor: Colors.transparent,
+                  insetPadding: EdgeInsets.zero,
+                  child: SizedBox(
+                    width: 450,
+                    child: ChangeNotifierProvider.value(
+                        value: _playProvider,
+                        child: Builder(
+                          builder: (context) => ResultControlsPage(
+                            code: _controller.text,
+                            theme: theme,
+                          ),
+                        )),
                   ),
-                )),
-          ));
+                ),
+              );
+            });
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChangeNotifierProvider.value(
+                  value: _playProvider,
+                  child: Builder(
+                    builder: (context) => ResultControlsPage(
+                      code: _controller.text,
+                      theme: theme,
+                    ),
+                  )),
+            ));
+      }
     }
   }
 
@@ -319,7 +348,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
 
     if (_controller.text == _playProvider.activeProjectCode) {
       saved = true;
-    }else{
+    } else {
       saved = false;
     }
 
@@ -329,7 +358,6 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
         value: _controller.text,
         saved: saved,
       );
-     
     }
   }
 
