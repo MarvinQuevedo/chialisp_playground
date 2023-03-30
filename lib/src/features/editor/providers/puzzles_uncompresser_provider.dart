@@ -117,10 +117,19 @@ class PuzzleUncompressersProvider extends ChangeNotifier {
         file.writeContent(outputStream);
         outputStream.close();
       }
-      if (file.name != ("puzzles$_DS")) {
-        _includeFilesNames.add(file.name.replaceAll("puzzles/", ""));
+      
+    }
+    final puzzleDir = Directory('${_appDocDir.absolute.path}${_DS}puzzles');
+    for (var file in puzzleDir.listSync()) {
+      if (file is File) {
+        final fileName = file.path.split(_DS).last;
+        final ext = fileName.split(".").last;
+        if (ext == "clsp") {
+          _includeFilesNames.add(fileName);
+        }
       }
     }
+   
     try {
       puzzleFile.deleteSync();
     } catch (e) {
