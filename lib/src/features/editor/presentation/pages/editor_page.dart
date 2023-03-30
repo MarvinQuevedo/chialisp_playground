@@ -1,3 +1,4 @@
+import 'package:chialisp_playground/src/features/editor/data/temp_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -231,6 +232,8 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       await _playProvider.saveProject(
           fileName(activeProject.path), _controller.text);
       // ignore: use_build_context_synchronously
+
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const MeSnackbar(
         content: Text("File saved", style: TextStyle(color: Colors.white)),
       ));
@@ -256,7 +259,6 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       _editorFocusNode.removeListener(_forceInitializedEditor);
     }
   }
-  
 
   void _initEditor() {
     final puzzlesProvider = Provider.of<PuzzleUncompressersProvider>(
@@ -311,12 +313,20 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
       context,
       listen: false,
     );
-    final saved = _playProvider.savedNotifier.value;
-
+    var saved = _playProvider.savedNotifier.value;
     final activeProject = proHandler.currentProject;
+
     if (activeProject != null) {
       proHandler.onChangeText(
-          projectData: activeProject, value: _controller.text);
+        projectData: activeProject,
+        value: _controller.text,
+      );
+   
+      if (_playProvider.activeProjectCode == _controller.text) {
+        saved = true;
+        _playProvider.removeTempFile(activeProject);
+      }
+   
       proHandler.updateValue(activeProject.copyWith(
         saved: saved,
       ));
