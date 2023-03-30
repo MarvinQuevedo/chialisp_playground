@@ -52,7 +52,7 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   void openProject(File file, bool readOnly) {
     final projectData = ProjectData(file, readOnly, _calculateId(file));
     if (!projects.contains(projectData)) {
-      _projects[projects.length] = projectData;
+      _projects[projects.length + 1] = projectData;
       _currentProject = projectData;
       _sharedPreferencfes.setString(_LAST_PROJECT, file.absolute.path);
       notifyListeners();
@@ -103,8 +103,30 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeAllProjects() {
-    _projects = {};
+  void closeAllProjects({ProjectData? keepProject}) {
+    if (keepProject != null) {
+      _projects = {0: keepProject};
+      _currentProject = keepProject;
+    } else {
+      _projects = {};
+      _currentProject = null;
+    }
+
+    notifyListeners();
+  }
+
+  void closeAllRighProjects(ProjectData projectData) {
+    var proIndex = getProjectIndex(projectData);
+
+    if (proIndex != null) {
+      _projects.removeWhere((key, value) => key > proIndex);
+      if (_currentProject != null) {
+        final activeProjectIndex = getProjectIndex(_currentProject!);
+        if (activeProjectIndex == null) {
+          openProject(projectData.file, projectData.readOnly);
+        }
+      }
+    }
     notifyListeners();
   }
 
@@ -116,18 +138,22 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   }
 
   void onChangeText(
-      {required ProjectData projectData, required String value}) async {
-    final stopWatch = Stopwatch()..start();
+      {required ProjectData projectData,
+      required String value,
+      bool? saved}) async {
     TempRepository.instance.set(projectData.id, value);
-    updateValue(projectData.copyWith(saved: true));
-    stopWatch.stop();
-    developer.log("onChangeText: ${stopWatch.elapsedMilliseconds}");
+    if (saved != null && saved == true) {
+      TempRepository.instance.remove(projectData.id);
+    }
+    updateValue(projectData.copyWith(saved: saved ?? true));
+    developer.log("onChangeText: ${value.length}");
   }
 
   void updateValue(ProjectData value) {
     final proIndex = getProjectIndex(value);
     if (proIndex != null) {
       _projects[proIndex] = value;
+      notifyListeners();
     }
   }
 
@@ -139,8 +165,13 @@ class ProjectsHandlerProvider extends ChangeNotifier {
   bool isSaved(ProjectData project) {
     final proIndex = getProjectIndex(project);
     if (proIndex != null) {
-      TempRepository.instance.get(project.id);
+      return TempRepository.instance.get(project.id) == null;
     }
     return false;
+  }
+
+  void deleteTempFile(ProjectData value) {
+    TempRepository.instance.remove(value.id);
+    notifyListeners();
   }
 }

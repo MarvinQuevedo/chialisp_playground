@@ -7,7 +7,7 @@ abstract class EditorActionHelper {
   void undoCode( );
   void redoCode( );
   void saveFile(  {String title = 'Save file'});
-  void openRunPage( );
+  void openRunPage({bool isDesktop = false});
 }
 
 class EditorActionsProvider extends ChangeNotifier{ 

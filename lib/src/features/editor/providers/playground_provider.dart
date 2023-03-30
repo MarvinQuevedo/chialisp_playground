@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:archive/archive_io.dart';
+import 'package:chialisp_playground/src/features/editor/providers/projects_handler_provider.dart';
 import 'package:chialisp_playground/src/features/editor/utils/default_clsp_project.dart';
 import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,8 +20,6 @@ class PlaygroundProvider extends ChangeNotifier {
   final CodeController _controller;
 
   PlaygroundProvider(this._controller);
-
- 
 
   File? _activeProject;
   File? get activeProject => _activeProject;
@@ -138,10 +137,12 @@ class PlaygroundProvider extends ChangeNotifier {
       return defaultClspProject;
     }
     _activeProject = file;
-    final tempData = TempRepository.instance.get(activeProjectName ?? "...");
-    if (tempData != null) {
+    final tempData = TempRepository.instance.get(file.absolute.path);
+    if (tempData != null && tempData.isNotEmpty) {
       _controller.text = tempData;
-      _activeProjectCode = tempData;
+      final fileData = await file.readAsString();
+      _activeProjectCode = fileData;
+
       developer.log("loadProject: $tempData", name: "PlaygroundProvider");
       _saved.value = false;
       return tempData;
@@ -168,7 +169,7 @@ class PlaygroundProvider extends ChangeNotifier {
 
     await loadProject(file);
     _saved.value = false;
-    TempRepository.instance.remove(activeProjectName ?? "...");
+    TempRepository.instance.remove(activeProject?.absolute.path ?? "....");
     return true;
   }
 
@@ -212,5 +213,13 @@ class PlaygroundProvider extends ChangeNotifier {
       tempFolder.createSync(recursive: true);
     }
     return tempFolder;
+  }
+
+  void updatePuzzlesNames(List<String> puzzlesFilesNames) {
+    updateProjectsFilesNames(puzzlesFilesNames);
+  }
+
+  void removeTempFile(ProjectData? activeProject) {
+    TempRepository.instance.remove(activeProject?.id ?? "");
   }
 }

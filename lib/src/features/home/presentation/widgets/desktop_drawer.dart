@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
+import 'desktop_libs_list.dart';
 import 'desktop_projects_list.dart';
 
 enum DrawerItemType {
   projects,
+  libs
 }
 
 class DesktopDrawer extends StatefulWidget {
@@ -22,7 +24,8 @@ class _DesktopDrawerState extends State<DesktopDrawer> {
     switch (selectedItem) {
       case DrawerItemType.projects:
         return const DesktopProjectsList();
-
+      case DrawerItemType.libs:
+        return const DesktopLibList();
       default:
         return null;
     }
@@ -44,6 +47,12 @@ class _DesktopDrawerState extends State<DesktopDrawer> {
                 icon: const Icon(Ionicons.documents_outline),
                 onChanged: _changeValue,
                 value: DrawerItemType.projects,
+                groupValue: selectedItem,
+              ),
+               DrawerItem(
+                icon: const Icon(Ionicons.code_download_outline),
+                onChanged: _changeValue,
+                value: DrawerItemType.libs,
                 groupValue: selectedItem,
               )
             ],
