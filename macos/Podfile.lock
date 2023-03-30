@@ -36,7 +36,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
-  flutter_chia_rust_utils: 898ee05f0040dbc790c5907dcaaa275fb0a73d25
+  flutter_chia_rust_utils: 7581aa861a9c312aa777e4ea63a035171ff4e0f6
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
   share_plus: 76dd39142738f7a68dd57b05093b5e8193f220f7
