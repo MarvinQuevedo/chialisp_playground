@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:archive/archive_io.dart';
+import 'package:chialisp_playground/src/features/editor/providers/projects_handler_provider.dart';
 import 'package:chialisp_playground/src/features/editor/utils/default_clsp_project.dart';
 import 'package:chialisp_playground/src/features/editor/utils/dir_splitter.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +25,7 @@ class PlaygroundProvider extends ChangeNotifier {
 
   File? _activeProject;
   File? get activeProject => _activeProject;
+ 
 
   final _saved = ValueNotifier(false);
   bool get saved => _saved.value;
@@ -168,7 +170,7 @@ class PlaygroundProvider extends ChangeNotifier {
 
     await loadProject(file);
     _saved.value = false;
-    TempRepository.instance.remove(activeProjectName ?? "...");
+    TempRepository.instance.remove(activeProject?.absolute.path??"....");
     return true;
   }
 
@@ -216,5 +218,9 @@ class PlaygroundProvider extends ChangeNotifier {
 
   void updatePuzzlesNames(List<String> puzzlesFilesNames) {
     updateProjectsFilesNames(puzzlesFilesNames);
+  }
+
+  void removeTempFile(ProjectData? activeProject) {
+     TempRepository.instance.remove(activeProject?.id??"");
   }
 }
