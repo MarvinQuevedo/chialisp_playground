@@ -30,5 +30,7 @@
 	<string>NSApplication</string>
 	<key>UISupportsDocumentBrowser</key>
 	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.business</string>
 </dict>
 </plist>
