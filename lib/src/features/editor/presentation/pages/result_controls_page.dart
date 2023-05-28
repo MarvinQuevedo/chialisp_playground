@@ -318,7 +318,7 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     setState(() {
       _outputs.add(_Output(args, _OutputType.args));
     });
-    ChiaToolsCmds.brun([compiledValue, "($args)", '-i', playgroundPath])
+    ChiaToolsCmds.brun([compiledValue, "($args)", '-i', '-v', playgroundPath])
         .then((value) {
       setState(() {
         _outputs.add(_Output(value, _OutputType.run));
