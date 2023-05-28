@@ -41,12 +41,17 @@ class ProjectsProvider extends ChangeNotifier {
         if (ext == "zip") {
           element.delete();
           return;
-        }else if(ext == "clsp"){
-           _projects?.add(element);
+        } else if (ext == "clsp") {
+          _projects?.add(element);
         }
-       
       }
     });
     notifyListeners();
+  }
+
+  @override
+  // ignore: must_call_super
+  void dispose() {
+    //super.dispose();
   }
 }
