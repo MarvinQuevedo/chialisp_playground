@@ -37,7 +37,7 @@ dependencies:
     git:
       url: https://github.com/MarvinQuevedo/flutter-code-editor.git
       ref: main
-  flutter_chia_rust_utils: ^0.0.59+4
+  flutter_chia_rust_utils: ^0.0.61+1
   file_picker: ^5.2.6
  
   
