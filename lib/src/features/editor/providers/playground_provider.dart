@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import '../data/temp_repository.dart';
+import '../models/generated_file.dart';
 
 // ignore: non_constant_identifier_names
 final _DS = dirSplitter;
@@ -65,6 +66,13 @@ class PlaygroundProvider extends ChangeNotifier {
     return _activeProject?.path.split(_DS).last;
   }
 
+    String? get activeProjectNameWithoutExtension {
+    if (_activeProject == null) {
+      return null;
+    }
+    return _activeProject?.path.split(_DS).last.split('.').first;
+  }
+
   void updateProjectsFilesNames(List<String> projectsFilesNames) {
     _includeFilesNames.addAll(projectsFilesNames);
     _includeFilesNames = _includeFilesNames.toSet().toList();
@@ -92,6 +100,32 @@ class PlaygroundProvider extends ChangeNotifier {
     _includeFilesNames = _includeFilesNames.toSet().toList();
 
     await loadProject(file);
+  }
+
+  bool saveGeneratedFilesForProject(File project,
+      {required List<GeneratedFile> feneratedFiles}) {
+    final projectName = project.path.split(_DS).last.split('.').first;
+    final genereatedDir =
+        Directory('${_appDocDir.path}${_DS}generated$_DS$projectName');
+    if (!genereatedDir.existsSync()) {
+      genereatedDir.createSync(recursive: true);
+    }
+    for (final file in feneratedFiles) {
+      final generatedFile =
+          File('${genereatedDir.path}$_DS${file.name}.${file.extension}');
+      generatedFile.writeAsStringSync(file.content);
+    }
+    return true;
+  }
+  List<File> getGeneratedFilesForProject(File project) {
+    final projectName = project.path.split(_DS).last.split('.').first;
+    final genereatedDir =
+        Directory('${_appDocDir.path}${_DS}generated$_DS$projectName');
+    if (!genereatedDir.existsSync()) {
+      return [];
+    }
+    final files = genereatedDir.listSync();
+    return files.map((e) => File(e.path)).toList();
   }
 
   Future<bool> includePuzzleFiles(List<String> puzzleFiles) async {
@@ -176,9 +210,11 @@ class PlaygroundProvider extends ChangeNotifier {
   Future<File> genereSharedActiveProject(
       String code, List outputs, List<String> puzzleFiles) async {
     final file = _activeProject!;
+
     await file.writeAsString(code);
     await includePuzzleFiles(puzzleFiles);
     List<File> includeFiles = [];
+    final generatedFiles = getGeneratedFilesForProject(file);
     playgroundDir.listSync().forEach((element) {
       if (element is File) {
         includeFiles.add(element);
@@ -194,6 +230,11 @@ class PlaygroundProvider extends ChangeNotifier {
     for (final file in includeFiles) {
       final fileName = file.path.split(_DS).last;
       final includeFilename = "include$_DS$fileName";
+      await archive.addFile(file, includeFilename);
+    }
+    for (final file in generatedFiles) {
+      final fileName = file.path.split(_DS).last;
+      final includeFilename = "generated$_DS$fileName";
       await archive.addFile(file, includeFilename);
     }
     await archive.addFile(file);
