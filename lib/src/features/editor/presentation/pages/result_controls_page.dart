@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../../models/generated_file.dart';
 import '../../utils/dir_splitter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,6 +22,7 @@ import '../../utils/snackbar.dart';
 
 enum _OutputType {
   compile,
+  compiledSerialized,
   run,
   curry,
   includedFiles,
@@ -145,9 +147,9 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
                             ),
                           ),
                           if (building && isLast)
-                            Center(
+                            const Center(
                               child: Column(
-                                children: const [
+                                children: [
                                   SizedBox(height: 10),
                                   CupertinoActivityIndicator(radius: 20),
                                 ],
@@ -267,6 +269,9 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
         return 'Error';
       case _OutputType.args:
         return 'Args';
+
+      case _OutputType.compiledSerialized:
+        return 'Compiled serialized';
     }
   }
 
@@ -278,11 +283,41 @@ class _ResultControlsPageState extends State<ResultControlsPage> {
     });
     playgroundProvider.includePuzzleFiles(_includedFiles).then((value) {
       final playgroundPath = playgroundProvider.playgroundInclude;
+      final name = playgroundProvider.activeProjectNameWithoutExtension;
       ChiaToolsCmds.run([widget.code, '-i', playgroundPath]).then((value) {
         setState(() {
           _outputs.add(_Output(value, _OutputType.compile));
           building = false;
           compiled = value;
+        });
+        playgroundProvider.saveGeneratedFilesForProject(playgroundProvider.activeProject!, feneratedFiles: [
+          GeneratedFile(
+            name: name!,
+            content: value,
+            extension: "clvm",
+            type: 'clvm'
+          )
+        ]);
+
+        ChiaToolsCmds.opc([value]).then((values) {
+          setState(() {
+            for (final value in values) {
+              _outputs.add(
+                _Output(
+                  value.toHex(),
+                  _OutputType.compiledSerialized,
+                ),
+              );
+                 playgroundProvider.saveGeneratedFilesForProject(playgroundProvider.activeProject!, feneratedFiles: [
+          GeneratedFile(
+            name: name!,
+            content:  value.toHex(),
+            extension: "clvm.hex",
+            type: 'clvm.hex'
+          )
+        ]);
+            }
+          });
         });
       });
     }).catchError((error) {
