@@ -174,4 +174,11 @@ class ProjectsHandlerProvider extends ChangeNotifier {
     TempRepository.instance.remove(value.id);
     notifyListeners();
   }
+
+  void deleteProject(File file) {
+    final projectData = ProjectData(file, false, _calculateId(file));
+    closeProject(projectData);
+    file.deleteSync();
+    notifyListeners();
+  }
 }

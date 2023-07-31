@@ -194,10 +194,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_chia_rust_utils
-      sha256: a13d80a05c3e4d33cef01f805921886785ad195bdec57be70f357cc2940d6b0a
+      sha256: fcb98561f5b2d76ff7cad21fd0379a7ec3fdbd0092cc19f3e249120189ee3384
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.59+4"
+    version: "0.0.61+1"
   flutter_code_editor:
     dependency: "direct main"
     description:

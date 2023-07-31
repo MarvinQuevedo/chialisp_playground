@@ -331,11 +331,14 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
   }
 
   void _updateProjectsNames() {
-    final projectsProvider = Provider.of<ProjectsProvider>(
-      context,
-      listen: false,
-    );
-    _playProvider.updateProjectsFilesNames(projectsProvider.projectsFilesNames);
+    if (mounted) {
+      final projectsProvider = Provider.of<ProjectsProvider>(
+        context,
+        listen: false,
+      );
+      _playProvider
+          .updateProjectsFilesNames(projectsProvider.projectsFilesNames);
+    }
   }
 
   void _onTextChanged() {

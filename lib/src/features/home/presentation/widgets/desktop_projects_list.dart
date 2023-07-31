@@ -20,11 +20,14 @@ class DesktopProjectsList extends StatefulWidget {
 }
 
 class _DesktopProjectsListState extends State<DesktopProjectsList> {
- final  double _width = 200;
+  final double _width = 200;
+
+  RenderBox? referenceBox;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _loadProjectsList();
+      _loadRender();
     });
     super.initState();
   }
@@ -32,6 +35,7 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
   @override
   Widget build(BuildContext context) {
     final themePro = Provider.of<ThemeProvider>(context);
+
     return ConstrainedBox(
         constraints: const BoxConstraints(
           minHeight: 200,
@@ -89,6 +93,8 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
                       return ProjectItem(
                         file: file,
                         onTap: () => _openProject(context, file),
+                        getRenderBox: () => referenceBox!,
+                        onDelete: () => _onDeleteProject(file, context),
                       );
                     },
                   ),
@@ -105,7 +111,8 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
   }
 
   void _loadProjectsList({bool forceLoading = false}) {
-    Provider.of<ProjectsProvider>(context, listen: false).loadProjects(forceLoading: forceLoading);
+    Provider.of<ProjectsProvider>(context, listen: false)
+        .loadProjects(forceLoading: forceLoading);
   }
 
   _createNewFile(BuildContext context) {
@@ -114,11 +121,33 @@ class _DesktopProjectsListState extends State<DesktopProjectsList> {
         final proHandler =
             Provider.of<ProjectsHandlerProvider>(context, listen: false);
         proHandler.openProjectWithName(result, false);
+        _reload();
       }
     });
   }
 
   _reload() {
     _loadProjectsList(forceLoading: true);
+  }
+
+  void _loadRender() {
+    setState(() {
+      referenceBox = context.findRenderObject() as RenderBox?;
+    });
+  }
+
+  _onDeleteProject(File file, BuildContext context) {
+    final proHandler = Provider.of<ProjectsHandlerProvider>(
+      context,
+      listen: false,
+    );
+    final proProvider = Provider.of<ProjectsProvider>(context, listen: false);
+
+    proHandler.deleteProject(file);
+    Future.delayed(const Duration(milliseconds: 100), () {
+      proProvider.loadProjects(
+        forceLoading: false,
+      );
+    });
   }
 }
