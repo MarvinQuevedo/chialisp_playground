@@ -217,7 +217,7 @@ class EditorPageState extends State<EditorPage> with EditorActionHelper {
                   backgroundColor: Colors.transparent,
                   insetPadding: EdgeInsets.zero,
                   child: SizedBox(
-                    width: 450,
+                    width: 650,
                     child: ChangeNotifierProvider.value(
                         value: _playProvider,
                         child: Builder(
